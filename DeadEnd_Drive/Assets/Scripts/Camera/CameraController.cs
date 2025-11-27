@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float sensitivity = 300f;   // muisgevoeligheid
-    public Transform player;           // sleep hier de Player in
+    public float sensitivity = 300f;  // muisgevoeligheid
+    public Transform player;          // sleep hier de Player in
 
     private float xRotation = 0f;
 
@@ -18,10 +18,10 @@ public class CameraController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
 
-        // roteer speler horizontaal
+        // horizontale rotatie van speler
         player.Rotate(Vector3.up * mouseX);
 
-        // roteer camera verticaal
+        // verticale rotatie van camera
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);

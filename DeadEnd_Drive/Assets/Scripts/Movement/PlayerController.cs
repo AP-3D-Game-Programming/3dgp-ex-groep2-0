@@ -3,9 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 10f;         // beweging snelheid
-    public float jumpForce = 5f;      // sprongkracht
-    public Transform cameraPos;       // sleep hier de Camera in
+    public float speed = 10f;                    // loopsnelheid
+    public float jumpForce = 5f;                 // springkracht
+    public Transform cameraPos;                  // alleen voor FOV/positie, niet voor movement
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -13,32 +13,35 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();          // haalt rigidbody op
+        rb.freezeRotation = true;                // voorkomt dat physics de speler kan draaien
     }
 
     void Update()
     {
-        HandleJump();
+        HandleJump();                            // check sprong per frame
     }
 
     void FixedUpdate()
     {
-        HandleMovement();
+        HandleMovement();                        // fysiek correcte beweging
     }
 
     void HandleMovement()
     {
-        float h = Input.GetAxis("Horizontal"); // A/D
-        float v = Input.GetAxis("Vertical");   // W/S
+        float h = Input.GetAxis("Horizontal");   // A/D input
+        float v = Input.GetAxis("Vertical");     // W/S input
 
-        // Richting gebaseerd op camera
-        Vector3 move = (cameraPos.forward * v + cameraPos.right * h);
-        move.y = 0;
+        // ⛔ NIET camera.forward gebruiken → veroorzaakt spin bug
+        // ✔ Gebruikt spelerrotatie (player draait door muis ↔ camera niet door physics)
+        Vector3 move = (transform.forward * v + transform.right * h);
+
+        move.y = 0;                              // geen verticale beweging
 
         if (move.magnitude > 1f)
-            move.Normalize();
+            move.Normalize();                    // voorkomt sprint exploit diagonaal
 
-        // Vloeiende beweging via velocity, behoud Y-velocity voor springen
+        // behoud verticale snelheid (gravity)
         rb.linearVelocity = move * speed + new Vector3(0, rb.linearVelocity.y, 0);
     }
 
