@@ -5,7 +5,7 @@ public class Outline : MonoBehaviour
 {
     public Color outlineColor = Color.yellow;      // kleur van de outline
     public float outlineWidth = 0.1f;              // breedte van de outline in wereld-units
-    public bool testEnableOnStart = true;          // toon outline direct bij starten
+    public bool testEnableOnStart = false;         // nooit automatisch aan bij start
 
     private Material outlineMaterial;             // outline materiaal
     private Material[] originalMaterials;         // originele materials opslaan
@@ -29,15 +29,13 @@ public class Outline : MonoBehaviour
             return;
         }
 
+        // maak outline materiaal één keer
         outlineMaterial = new Material(s);
         outlineMaterial.SetColor("_OutlineColor", outlineColor);
         outlineMaterial.SetFloat("_OutlineWidth", outlineWidth);
         outlineMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-        DisableOutline();
-
-        if (testEnableOnStart)
-            EnableOutline();
+        DisableOutline(); // start altijd uit
     }
 
     public void EnableOutline()
@@ -48,14 +46,14 @@ public class Outline : MonoBehaviour
         rend.materials.CopyTo(mats, 0);
         mats[mats.Length - 1] = outlineMaterial;
         rend.materials = mats;
-
-        Debug.Log($"EnableOutline: totaal materialen = {rend.materials.Length}");
     }
 
     public void DisableOutline()
     {
         if (rend == null || originalMaterials == null) return;
-        rend.materials = originalMaterials;
+
+        rend.materials = originalMaterials; // zet originele materials terug
+        // outlineMaterial behouden zodat EnableOutline() later werkt
     }
 
     public void SetOutlineColor(Color c)

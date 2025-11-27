@@ -8,15 +8,15 @@ Shader "Custom/QuickOutline"
 
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue"="Overlay" }
+        Tags { "RenderType"="Opaque" "Queue"="Overlay" }
         LOD 100
 
         Pass
         {
             Name "Outline"
-            Cull Off
+            Cull Front             // backfaces tekenen zodat outline zichtbaar aan alle kanten
             ZWrite Off
-            ZTest Always
+            ZTest LEqual
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM

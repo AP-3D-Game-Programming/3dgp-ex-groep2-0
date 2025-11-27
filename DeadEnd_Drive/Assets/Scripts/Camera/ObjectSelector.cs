@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ObjectSelector : MonoBehaviour
 {
-    public float detectDistance = 5f;      // afstand waarop speler kan selecteren
+    public float detectDistance = 1;      // afstand waarop speler kan selecteren
     public LayerMask selectableMask;       // layer van selecteerbare objecten
 
     private Outline currentSelected;       // huidig geselecteerd object
@@ -20,6 +20,8 @@ public class ObjectSelector : MonoBehaviour
 
     void DetectLookedObject()
     {
+
+
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         if (Physics.Raycast(ray, out RaycastHit hit, detectDistance, selectableMask))
         {
