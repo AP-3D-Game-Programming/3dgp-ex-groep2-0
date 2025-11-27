@@ -1,59 +1,72 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class QuickOutline : MonoBehaviour
+public class Outline : MonoBehaviour
 {
-    public Color outlineColor = Color.white;   // de kleur van de outline
-    public float outlineWidth = 4f;            // dikte van de outline
+    public Color outlineColor = Color.yellow;      // kleur van de outline
+    public float outlineWidth = 0.1f;              // breedte van de outline in wereld-units
+    public bool testEnableOnStart = true;          // toon outline direct bij starten
 
-    private Material outlineMaterial;          // opslag voor outline materiaal
-    private Material[] originalMaterials;      // om originele materialen te bewaren
+    private Material outlineMaterial;             // outline materiaal
+    private Material[] originalMaterials;         // originele materials opslaan
+    private Renderer rend;                        // renderer cache
 
     void Start()
     {
-        Renderer rend = GetComponent<Renderer>();  
-        // ↑ haalt de renderer op zodat we toegang hebben tot de materials
+        rend = GetComponent<Renderer>();
+        if (rend == null)
+        {
+            Debug.LogError($"Outline: geen Renderer gevonden op {gameObject.name}");
+            return;
+        }
 
-        originalMaterials = rend.materials;  
-        // ↑ slaat de materials op zodat we ze kunnen terugzetten als outline uit gaat
+        originalMaterials = rend.materials;
 
-        outlineMaterial = new Material(Shader.Find("Outlined/Uniform")); 
-        // ↑ maakt een outline materiaal aan (shader geef ik hieronder)
+        Shader s = Shader.Find("Custom/QuickOutline");
+        if (s == null)
+        {
+            Debug.LogError("Outline: shader 'Custom/QuickOutline' niet gevonden!");
+            return;
+        }
 
-        outlineMaterial.SetColor("_OutlineColor", outlineColor); 
-        // ↑ kleur instellen
+        outlineMaterial = new Material(s);
+        outlineMaterial.SetColor("_OutlineColor", outlineColor);
+        outlineMaterial.SetFloat("_OutlineWidth", outlineWidth);
+        outlineMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-        outlineMaterial.SetFloat("_Outline", outlineWidth);      
-        // ↑ breedte instellen
+        DisableOutline();
 
-        DisableOutline(); 
-        // ↑ standaard outline uit
+        if (testEnableOnStart)
+            EnableOutline();
     }
 
     public void EnableOutline()
     {
-        Renderer rend = GetComponent<Renderer>();  
-        // ↑ opnieuw renderer ophalen
+        if (rend == null || outlineMaterial == null) return;
 
-        Material[] mats = new Material[rend.materials.Length + 1]; 
-        // ↑ nieuw array maken met 1 extra slot voor de outline
+        Material[] mats = new Material[rend.materials.Length + 1];
+        rend.materials.CopyTo(mats, 0);
+        mats[mats.Length - 1] = outlineMaterial;
+        rend.materials = mats;
 
-        rend.materials.CopyTo(mats, 0); 
-        // ↑ originele materials kopiëren naar nieuw array
-
-        mats[mats.Length - 1] = outlineMaterial; 
-        // ↑ laatste slot vullen met onze outline laag
-
-        rend.materials = mats;  
-        // ↑ renderer krijgt nu materialen inclusief outline
+        Debug.Log($"EnableOutline: totaal materialen = {rend.materials.Length}");
     }
 
     public void DisableOutline()
     {
-        Renderer rend = GetComponent<Renderer>();  
-        // ↑ renderer ophalen
+        if (rend == null || originalMaterials == null) return;
+        rend.materials = originalMaterials;
+    }
 
-        rend.materials = originalMaterials;     
-        // ↑ originele materialen terugzetten
+    public void SetOutlineColor(Color c)
+    {
+        outlineColor = c;
+        if (outlineMaterial != null) outlineMaterial.SetColor("_OutlineColor", c);
+    }
+
+    public void SetOutlineWidth(float w)
+    {
+        outlineWidth = w;
+        if (outlineMaterial != null) outlineMaterial.SetFloat("_OutlineWidth", w);
     }
 }
