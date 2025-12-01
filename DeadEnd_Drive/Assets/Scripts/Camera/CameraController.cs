@@ -3,7 +3,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public float sensitivity = 300f;  // muisgevoeligheid
-    public Transform player;          // sleep hier de Player in
+    public Transform target;          // sleep hier de Player in
     public float defaultFOV = 120;    // standaard FOV
     private float xRotation = 0f;
     private Camera cam;               // referentie naar de camera
@@ -25,7 +25,7 @@ public class CameraController : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
 
         // horizontale rotatie van speler
-        player.Rotate(Vector3.up * mouseX);
+        target.Rotate(Vector3.up * mouseX);
 
         // verticale rotatie van camera
         xRotation -= mouseY;
