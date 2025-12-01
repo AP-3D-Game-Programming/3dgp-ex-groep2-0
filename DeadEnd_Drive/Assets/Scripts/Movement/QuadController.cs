@@ -10,7 +10,7 @@ public class QuadController : MonoBehaviour
     PlayerCont playerControllerScript;
     Rigidbody rb;
     public float speed = 200000f;       // snelheid
-    public float rotationSpeed = 150f;   //draai snelheid
+    public float rotationSpeed = 10000000000;   //draai snelheid
     public bool isOnQuad;
     public Text text;
 
