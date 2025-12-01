@@ -8,6 +8,7 @@ public class PlayerCont : MonoBehaviour
     public bool isGround;
     private bool hasJumped = false;
     Rigidbody rb;
+    private GameObject quad;
 
     public float speed = 5f;
 
@@ -20,12 +21,45 @@ public class PlayerCont : MonoBehaviour
 
     void Update()
     {
-        HandleJump();
+        if (!quad)
+        {
+            HandleJump();                        // check sprong per frame
+        }
     }
 
     void FixedUpdate()
     {
-        HandleMovement();
+
+        if (!quad)
+        {
+            HandleMovement();               // fysiek correcte beweging
+        }
+        else
+        {
+            transform.position = quad.transform.position + (Vector3.up * 1.5f);
+        }
+    }
+
+
+    public void AddQuad(GameObject quad)
+    {
+        this.quad = quad;
+        // 1. Schakel de Rigidbody uit
+        rb.isKinematic = true;
+        // 2. Schakel de Collider uit
+        GetComponent<Collider>().enabled = false;
+    }
+
+    public void DeleteQuad()
+    {
+        this.quad = null;
+        // 1. Schakel de Rigidbody weer in
+        rb.isKinematic = false;
+        // 2. Schakel de Collider weer in
+        GetComponent<Collider>().enabled = true;
+
+        // Optioneel: Plaats de speler een stukje boven de quad om meteen uit de collider te zijn
+        transform.position += Vector3.up * 0.5f;
     }
 
     void HandleJump()
