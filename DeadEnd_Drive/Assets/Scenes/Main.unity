@@ -217,7 +217,8 @@ PrefabInstance:
       value: Canvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 459325410252652387, guid: e0cb5aa7f04fc6a43a192bd3a63d1e62, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e0cb5aa7f04fc6a43a192bd3a63d1e62, type: 3}
@@ -367,14 +368,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 228474523}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 35.475098, y: 4.25, z: -54.025208}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 308.19, y: 4.25, z: 388.98}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 669472584}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &469683864
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,15 +553,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 543.5
+      value: 321
       objectReference: {fileID: 0}
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.78
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 554.6
+      value: 375.2
       objectReference: {fileID: 0}
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalRotation.w
@@ -975,7 +976,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &896990524
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2031,7 +2032,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6287319582821478381, guid: 77653068d1cd5254c82b4e0048353235, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.21
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6287319582821478381, guid: 77653068d1cd5254c82b4e0048353235, type: 3}
       propertyPath: m_LocalPosition.z

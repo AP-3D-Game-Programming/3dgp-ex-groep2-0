@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using System.Collections;
 
 public class CarEntry : MonoBehaviour
 {
@@ -78,6 +79,14 @@ public class CarEntry : MonoBehaviour
         playerRb.isKinematic = true;
         playerRb.constraints = RigidbodyConstraints.FreezeAll;
 
+        // Reset car damping to normal driving values
+        Rigidbody carRb = vehicle.GetComponent<Rigidbody>();
+        if (carRb != null)
+        {
+            carRb.linearDamping = 0.1f;
+            carRb.angularDamping = 0.1f;
+        }
+
         // Enable vehicle controls
         vehicle.GetComponent<CarController>().enabled = true;
     }
@@ -85,20 +94,63 @@ public class CarEntry : MonoBehaviour
     private void ExitVehicle()
     {
         isInVehicle = false;
-        player.GetComponent<PlayerCont>().enabled = true;
-        playerRb.detectCollisions = true;
 
+        if (player.GetComponent<PlayerCont>() != null)
+        {
+            player.GetComponent<PlayerCont>().enabled = true;
+        }
+
+        playerRb.detectCollisions = true;
         // Unparent player
         player.SetParent(null);
 
         // Unlock physics and movement
         playerRb.isKinematic = false;
         playerRb.constraints = RigidbodyConstraints.FreezeRotation;
-        player.GetComponent<PlayerCont>().enabled = true;
-        vehicle.GetComponent<CarController>().enabled = false;
+
+        // Disable the car controller script
+        if (vehicle.GetComponent<CarController>() != null)
+        {
+            vehicle.GetComponent<CarController>().enabled = false;
+        }
 
         // Move player slightly outside the vehicle
-        player.position = vehicle.position + vehicle.transform.right * 2f;
+        player.position = vehicle.position + vehicle.transform.right * -2f;
 
+        // Apply realistic braking to the car
+        Rigidbody carRb = vehicle.GetComponent<Rigidbody>();
+        if (carRb != null)
+        {
+            StartCoroutine(GradualStop(carRb));
+        }
+    }
+
+    private IEnumerator GradualStop(Rigidbody carRb)
+    {
+        Vector3 initialVelocity = carRb.linearVelocity;
+        float startSpeed = initialVelocity.magnitude;
+
+        float decelerationRate = 10f;
+
+        while (carRb.linearVelocity.magnitude > 0.1f)
+        {
+            // Reduce the current speed linearly
+            float newSpeed = Mathf.MoveTowards(carRb.linearVelocity.magnitude, 0f, decelerationRate * Time.deltaTime);
+
+            // Apply the new speed in the direction the car is currently moving
+            carRb.linearVelocity = carRb.linearVelocity.normalized * newSpeed;
+
+            yield return null;
+        }
+
+        carRb.linearVelocity = Vector3.zero;
+        carRb.angularVelocity = Vector3.zero;
+
+        // High drag to keep it parked
+        carRb.linearDamping = 100f;
+        carRb.angularDamping = 100f;
+
+        // Force sleep to ensure it doesn't slide down hills
+        carRb.Sleep();
     }
 }
