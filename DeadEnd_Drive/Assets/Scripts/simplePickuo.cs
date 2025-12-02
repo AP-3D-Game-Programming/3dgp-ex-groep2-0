@@ -14,6 +14,8 @@ public class Pickup : MonoBehaviour
     private Transform player;
     private bool pickedUp = false;
 
+    public AudioClip clip;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -53,6 +55,8 @@ public class Pickup : MonoBehaviour
 
     IEnumerator ShowJumpscare()
     {
+        AudioSource src = gameObject.GetComponent<AudioSource>();
+        src.PlayOneShot(this.clip);
         jumpscareImage.gameObject.SetActive(true);
         yield return new WaitForSeconds(1f);
         jumpscareImage.gameObject.SetActive(false);
