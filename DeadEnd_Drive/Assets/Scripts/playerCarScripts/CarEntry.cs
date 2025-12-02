@@ -18,10 +18,16 @@ public class CarEntry : MonoBehaviour
     private bool isInVehicle = false;
     private Rigidbody playerRb;
 
+    [Header("Sound")]
+    private AudioSource src;
+    public AudioClip startEngine;
+    public AudioClip driveEngine;
+
     void Start()
     {
         carEntry.gameObject.SetActive(false);
         playerRb = player.GetComponent<Rigidbody>();
+        src = gameObject.GetComponent<AudioSource>();
     }
 
     void Update()
@@ -46,6 +52,7 @@ public class CarEntry : MonoBehaviour
             {
                 carEntry.gameObject.SetActive(false);
                 EnterVehicle();
+                StartCoroutine(StartEngineRoutine());
             }
         }
         else
@@ -54,7 +61,25 @@ public class CarEntry : MonoBehaviour
         }
     }
 
-    private void HandlePlayerExit()
+    private IEnumerator StartEngineRoutine()
+    {
+
+        src.loop = false;
+
+        src.PlayOneShot(startEngine);
+
+        yield return new WaitForSeconds(startEngine.length);
+
+
+        src.clip = driveEngine;
+
+        src.loop = true;
+
+        src.Play();
+    }
+
+
+private void HandlePlayerExit()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -93,6 +118,7 @@ public class CarEntry : MonoBehaviour
 
     private void ExitVehicle()
     {
+        src.Stop();
         isInVehicle = false;
 
         if (player.GetComponent<PlayerCont>() != null)
@@ -154,3 +180,4 @@ public class CarEntry : MonoBehaviour
         carRb.Sleep();
     }
 }
+
