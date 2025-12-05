@@ -24,30 +24,22 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WaterDepthBased
-  m_Shader: {fileID: -6465566751694194690, guid: dfd4dcd41b27bb44498bfa407660802f, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 804215e93ee96064ea9e66b1b568d4f8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords:
-  - _DISABLE_DECALS
-  - _DISABLE_SSR
-  - _DOUBLESIDED_ON
-  - _ENABLE_FOG_ON_TRANSPARENT
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap:
     MotionVector: User
-    RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
   - TransparentDepthPostpass
   - TransparentBackface
   - RayTracingPrepass
-  - DepthOnly
-  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -73,7 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_489eb875f94145638707926756960d2c_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 3d0465da28334da439cc37c5a3ac88fe, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_58efab3a72ce490984457d9a1288b610_Texture_1:
@@ -102,6 +94,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - Vector1_10ed4378b97e491c87be8332ef96772d: 10
+    - Vector1_24ff6e9cb7b74dc3b52ca4f73ada0afa: 100
+    - Vector1_32e6be4cabf24aa4ad12240993018757: 1
+    - Vector1_568276ead9984cda9075833e28330979: 2
+    - Vector1_8028ba5d1357411db27b2787d5e5bfc1: 1
+    - Vector1_97194a2f68ad49d6a97d9679dabf3470: 1
+    - Vector1_c0e9288568be4bd78ddb56ee0a140829: 1
+    - Vector1_c3b9d1d3701047c7a5740d3181d250e2: 0.5
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaCutoffEnable: 0
@@ -129,6 +129,7 @@ Material:
     - _DoubleSidedGIMode: 0
     - _DoubleSidedNormalMode: 1
     - _DstBlend: 10
+    - _DstBlendAlpha: 10
     - _EnableBlendModePreserveSpecularLighting: 0
     - _EnableFogOnTransparent: 1
     - _Fresnel: 3
@@ -151,6 +152,7 @@ Material:
     - _Smoothness: 0.979
     - _Speed: 0.02
     - _SrcBlend: 5
+    - _SrcBlendAlpha: 1
     - _StencilRef: 0
     - _StencilRefDepth: 8
     - _StencilRefDistortionVec: 4
@@ -184,6 +186,9 @@ Material:
     - _normalStrength: 0
     - _speed: 0.001
     m_Colors:
+    - Color_30f6d212bd794f14a1bba9e8d660aeaa: {r: 1, g: 1, b: 1, a: 0.8}
+    - Color_95c20e50d1264b89ab876f2aac68625d: {r: 0, g: 0.8768053, b: 1, a: 0}
+    - Color_ade3598b96c441028a9427d412d014b5: {r: 0, g: 0.22272366, b: 1, a: 0}
     - _Deep_Water_Color: {r: 0.41941082, g: 0.4714051, b: 0.6132076, a: 0}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
@@ -208,4 +213,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 9
+  version: 10
