@@ -18,20 +18,17 @@ public class PortalWindowCamera : MonoBehaviour
 
     void LateUpdate()
     {
-        // 1. Compute player's position relative to the portal plane
         Vector3 playerOffset = playerCam.transform.position - portalOrigin.position;
-
-        // 2. Transform offset into portal local space
         Vector3 localOffset = portalOrigin.InverseTransformVector(playerOffset);
 
-        // 3. Mirror offset on Z axis (assuming portal faces +Z)
         localOffset.z = -localOffset.z;
 
-        // 4. Transform back into world space relative to linked portal
         portalCam.transform.position = linkedPortal.position + linkedPortal.TransformVector(localOffset);
 
-        // 5. Adjust rotation to mirror portal orientation
         Quaternion relativeRot = Quaternion.Inverse(portalOrigin.rotation) * playerCam.transform.rotation;
         portalCam.transform.rotation = linkedPortal.rotation * relativeRot;
+
+        portalCam.transform.Rotate(0f, 180f, 0f, Space.Self);
     }
+
 }

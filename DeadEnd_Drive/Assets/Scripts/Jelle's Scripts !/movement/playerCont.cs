@@ -7,10 +7,14 @@ public class PlayerCont : MonoBehaviour
     public float speed = 5f;
     public Vector3 jump = new Vector3(0, 2f, 0);
     public float jumpForce = 2f;
+    public float climbSpeed = 3f;
 
     [Header("Ground Check")]
     public bool isGrounded;
     private bool hasJumped = false;
+
+    [Header("Ladder/Stairs")]
+    public bool onLadderStairs = false;
 
     private Rigidbody rb;
 
@@ -35,18 +39,27 @@ public class PlayerCont : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        Vector3 moveDir = new Vector3(h, 0, v).normalized;
+        // Movement relative to player forward
+        Vector3 moveDir = new Vector3(h, 0, v);
+        Vector3 worldMove = transform.TransformDirection(moveDir).normalized;
 
-        if (moveDir.magnitude > 0.1f)
+        if (onLadderStairs)
         {
-            Vector3 worldMove = transform.TransformDirection(moveDir);
-            rb.MovePosition(rb.position + worldMove * speed * Time.fixedDeltaTime);
+            rb.useGravity = false;
+            // Horizontal moves normally, vertical controlled by climbSpeed
+            rb.linearVelocity = new Vector3(worldMove.x * speed, climbSpeed, worldMove.z * speed);
+        }
+        else
+        {
+            rb.useGravity = true;
+            // Horizontal moves normally, vertical comes from gravity/jump
+            rb.linearVelocity = new Vector3(worldMove.x * speed, rb.linearVelocity.y, worldMove.z * speed);
         }
     }
 
     void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !hasJumped)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !hasJumped && !onLadderStairs)
         {
             rb.AddForce(jump * jumpForce, ForceMode.Impulse);
             hasJumped = true;
@@ -69,5 +82,21 @@ public class PlayerCont : MonoBehaviour
     void OnCollisionExit(Collision collision)
     {
         isGrounded = false;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            onLadderStairs = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            onLadderStairs = false;
+        }
     }
 }

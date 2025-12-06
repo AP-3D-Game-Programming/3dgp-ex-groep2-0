@@ -13,11 +13,10 @@ GameObject:
   - component: {fileID: 8648499632307514795}
   - component: {fileID: 1693111432768930164}
   - component: {fileID: 9127690212238348264}
-  - component: {fileID: 2025912527396098848}
   - component: {fileID: 2946728770057661193}
+  - component: {fileID: 2435085933395611921}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,7 +53,6 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6033250026794681968}
-  m_Enabled: 0
   m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -143,24 +141,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2025912527396098848
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6033250026794681968}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a62c16a92010914991f1498413e6356, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 5
-  speed: 5
-  jump: {x: 0, y: 0, z: 0}
-  jumpForce: 2
-  isGrounded: 0
-  isGrounded: 0
 --- !u!82 &2946728770057661193
 AudioSource:
   m_ObjectHideFlags: 0
@@ -258,6 +238,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2435085933395611921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6033250026794681968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a62c16a92010914991f1498413e6356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 5
+  jump: {x: 0, y: 2, z: 0}
+  jumpForce: 2
+  isGrounded: 0
 --- !u!1 &7632804488653378748
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,7 +303,6 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7632804488653378748}
-  m_Enabled: 0
   m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
