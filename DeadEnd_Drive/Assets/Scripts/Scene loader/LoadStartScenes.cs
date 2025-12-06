@@ -11,5 +11,7 @@ public class AddSceneLoader : MonoBehaviour
     public void LoadSecondSceneAdditive()
     {
         SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+
     }
+
 }

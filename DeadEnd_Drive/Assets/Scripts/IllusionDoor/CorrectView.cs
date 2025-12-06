@@ -26,7 +26,7 @@ public class PortalWindowCamera : MonoBehaviour
         Quaternion relativeRot = Quaternion.Inverse(portalOrigin.rotation) * playerCam.transform.rotation;
         portalCam.transform.rotation = linkedPortal.rotation * relativeRot;
 
-        portalCam.transform.Rotate(0f, 180f, 0f, Space.Self);
+        portalCam.transform.Rotate(0f, 0f, 0f, Space.Self);
     }
 
 }

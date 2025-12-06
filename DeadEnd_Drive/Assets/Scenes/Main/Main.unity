@@ -878,8 +878,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8710b21d0ecb10489a9b6f0c8a1c8b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teleportTarget: {fileID: 1396783485}
-  playerTag: Player
+  additiveSceneName: Level1JH
+  spawnPoint: {fileID: 1196222332}
 --- !u!1 &469683864
 GameObject:
   m_ObjectHideFlags: 0
