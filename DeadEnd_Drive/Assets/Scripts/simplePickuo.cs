@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Animations.Rigging;
 
 public class Pickup : MonoBehaviour
 {
@@ -10,14 +11,19 @@ public class Pickup : MonoBehaviour
 
     public TMP_Text pickupText;
     public Image jumpscareImage;
+    public DoorController doorController;
 
     private Transform player;
     private bool pickedUp = false;
+    private Rigidbody rb;
 
     public AudioClip clip;
+    public GameObject teleporter;
 
     void Start()
     {
+        teleporter.gameObject.SetActive(false);
+        rb = GetComponent<Rigidbody>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
         if (pickupText) pickupText.gameObject.SetActive(false);
@@ -38,22 +44,25 @@ public class Pickup : MonoBehaviour
             {
                 pickedUp = true;
 
+                rb.gameObject.SetActive(false);
+                teleporter.gameObject.SetActive(true);
+
                 if (pickupText) pickupText.gameObject.SetActive(false);
+                doorController.SlamShut(1.5f);
 
-                // Hide the pickup visually but keep script alive
-                foreach (Transform child in transform)
-                    child.gameObject.SetActive(false);
 
-                StartCoroutine(ShowJumpscare());
+
+                //StartCoroutine(ShowJumpscare());
             }
         }
         else
         {
             if (pickupText) pickupText.gameObject.SetActive(false);
         }
+
     }
 
-    IEnumerator ShowJumpscare()
+    /*IEnumerator ShowJumpscare()
     {
         AudioSource src = gameObject.GetComponent<AudioSource>();
         src.PlayOneShot(this.clip);
@@ -62,5 +71,5 @@ public class Pickup : MonoBehaviour
         jumpscareImage.gameObject.SetActive(false);
 
         Destroy(gameObject); // NOW safe to destroy
-    }
+    }*/
 }

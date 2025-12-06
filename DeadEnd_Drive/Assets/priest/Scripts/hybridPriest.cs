@@ -1,13 +1,54 @@
 using UnityEngine;
+using System.Collections;
 
 public class HybridPriestAI : MonoBehaviour
 {
-    public enum State { Orbit, Haunt, Flee }
+    public enum State { Orbit, Haunt, Flee, JumpScare }
     public State currentState = State.Orbit;
 
     [Header("Targets")]
     public Transform player;
     public Transform playerCamera;
+
+    [Header("Fail-Safe")]
+    public Transform respawnPoint; // Drag your respawn location here in Inspector
+    public float fallThresholdY = 1000f; // If priest falls below this, we respawn
+
+
+    [Header("Jump Scare")]
+    public bool enableJumpScare = false;
+    public AudioClip jumpScareClip;
+    public bool isJumpScaring = false;
+    public float jumpScareSpeed = 10f;
+    public float jumpScareDistance = 0f;
+    public Vector3 jumpScareOffset = new Vector3(0, 0.25f, 0); // adjust face height
+    private Vector3 jumpScareTarget;
+    [Header("Respawn After JumpScare")]
+
+    private float jumpScareRespawnTimer = -1f;
+
+
+
+    [Tooltip("How precisely the player must look at the priest to trigger a jumpscare (degrees).")]
+    public float jumpScareViewAngle = 10f;   // smaller = more accurate center view
+    public MonsterManager spawner; // drag your spawner here in Inspector
+
+    [Header("Audio")]
+    public AudioSource breathSource;          // breathing loop source
+    public AudioSource whisperSource;         // whispers source
+
+    public AudioClip hauntBreathingLoop;      // breathing loop sound
+    public AudioClip whisperLine1;            // "You shouldn't have come here..."
+    public AudioClip whisperLine2;            // "We have been waiting..."
+
+    public float whisperMinDelay = 4f;
+    public float whisperMaxDelay = 10f;
+    public float specialWhisperCooldown = 6f;
+
+    float whisperTimer;
+    float lastSpecialWhisperTime = -999f;
+
+
 
     [Header("Distances")]
     public float orbitRadius = 8f;
@@ -21,13 +62,14 @@ public class HybridPriestAI : MonoBehaviour
 
     [Header("Haunt Behaviour")]
     [Range(-1f, 1f)]
+    [Tooltip("-1 = player looking away, 0 = 90 degr. left/right, 1 = player looking at priest")]
     public float lookDotThreshold = 0.6f; // 1 = straight at priest
     public float hauntStopDistance = 2f;  // how close Haunt is allowed to get
     public float overhang = 5f;
 
     [Header("Haunt Delay")]
     public float hauntDelay = 3f;  // time from orbit to haunt
-    float hauntDelayTimer = 0f;    // ✅ start from 0 so first haunt is delayed
+    float hauntDelayTimer = 0f;    // delay from orbit to haunt
 
     [Header("Flee Behaviour")]
     public bool enableFleeBehavior = true;   // master toggle
@@ -46,6 +88,10 @@ public class HybridPriestAI : MonoBehaviour
     public float raycastHeight = 10f;
     public float raycastDistance = 30f;
     public LayerMask groundLayers = ~0;
+
+    [Header("State Flags")]
+    public bool hasAttacked = false;
+
 
     float orbitAngle;
     float floatPhase;
@@ -69,6 +115,8 @@ public class HybridPriestAI : MonoBehaviour
     {
         orbitAngle = Random.Range(0f, 360f);
         floatPhase = Random.Range(0f, 10f);
+
+        whisperTimer = Random.Range(whisperMinDelay, whisperMaxDelay);
     }
 
     void Update()
@@ -77,12 +125,36 @@ public class HybridPriestAI : MonoBehaviour
 
         UpdatePlayerSpeed();
 
-        // ---- GLOBAL FREEZE CHECK ----
+
+        if (enableJumpScare && !isJumpScaring)
+            TryJumpScareTrigger();
+
+        // Jump scare movement
+        if (currentState == State.JumpScare)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                jumpScareTarget,
+                jumpScareSpeed * Time.deltaTime
+            );
+
+            transform.LookAt(playerCamera.position);
+
+            if (Vector3.Distance(transform.position, jumpScareTarget) < 0.1f)
+            {
+                spawner.DespawnPriest();
+                currentState = State.Flee; // Reset state so we don't get stuck
+            }
+
+            return;
+        }
+
+
+        // ---- Freeze logic (ONLY in Orbit & Haunt) ----
         Vector3 toPriest = (transform.position - playerCamera.position).normalized;
         bool playerLooking = Vector3.Dot(playerCamera.forward.normalized, toPriest) > lookDotThreshold;
         float distToPlayer = FlatDistanceToPlayer();
 
-        // ✅ Only freeze in Orbit & Haunt when NOT too close (so flee can still trigger)
         if ((currentState == State.Orbit || currentState == State.Haunt) &&
             playerLooking && distToPlayer > toFleeDistance)
         {
@@ -96,37 +168,40 @@ public class HybridPriestAI : MonoBehaviour
         switch (currentState)
         {
             case State.Orbit:
-                // Count up timer every frame in Orbit mode
                 hauntDelayTimer += Time.deltaTime;
+                if (enableFleeBehavior && distToPlayer < toFleeDistance && ShouldFleeFromPlayer())
+                    EnterFleeState();
 
-                // Timer reached haunt delay → switch state
                 if (hauntDelayTimer >= hauntDelay)
                 {
                     currentState = State.Haunt;
-                    hauntDelayTimer = 0f; // reset for next time
+                    hauntDelayTimer = 0f;
                 }
+                StopHauntAudio();
                 break;
 
             case State.Haunt:
+                StartHauntAudio();
+                DoWhisperLogic();
+
                 if (enableFleeBehavior && distToPlayer < toFleeDistance && ShouldFleeFromPlayer())
-                {
                     EnterFleeState();
-                }
                 else if (distToPlayer > toHauntDistance * 1.3f)
                 {
                     currentState = State.Orbit;
-                    hauntDelayTimer = 0f;   // ✅ ensure new haunt delay whenever we return to Orbit
+                    hauntDelayTimer = 0f;
                 }
                 break;
 
             case State.Flee:
+                StopHauntAudio();
                 if (useFleeTimer)
                 {
                     fleeTimer -= Time.deltaTime;
                     if (fleeTimer <= 0f)
                     {
                         currentState = State.Orbit;
-                        hauntDelayTimer = 0f;   // ✅ after fleeing, wait again before haunting
+                        hauntDelayTimer = 0f;
                     }
                 }
                 break;
@@ -137,11 +212,14 @@ public class HybridPriestAI : MonoBehaviour
         {
             case State.Orbit: DoOrbit(); break;
             case State.Haunt: DoHaunt(); break;
-            case State.Flee:  DoFlee();  break;
+            case State.Flee: DoFlee(); break;
         }
 
+
         ApplyFloating();
+        
     }
+
 
     // ================== LOGIC ==================
 
@@ -240,13 +318,178 @@ public class HybridPriestAI : MonoBehaviour
         Vector3 pos = transform.position;
         Vector3 rayOrigin = new Vector3(pos.x, pos.y + raycastHeight, pos.z);
 
-        float groundY = pos.y;
-        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, raycastDistance, groundLayers))
-            groundY = hit.point.y;
+        if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, raycastDistance, groundLayers))
+        {
+            Debug.LogWarning("Priest lost ground. Respawning...");
+            RespawnToSafePoint(startInFlee: true); // 👈 or false, depending on what you want
+            return;
+        }
 
+        float groundY = hit.point.y;
         float bob = Mathf.Sin((Time.time + floatPhase) * floatFrequency) * floatAmplitude;
 
         pos.y = groundY + hoverHeight + bob;
         transform.position = pos;
     }
+
+
+
+    void StartHauntAudio()
+    {
+        if (!breathSource || !hauntBreathingLoop) return;
+        if (breathSource.clip == hauntBreathingLoop && breathSource.isPlaying) return;
+
+        breathSource.clip = hauntBreathingLoop;
+        breathSource.loop = true;
+        breathSource.Play();
+    }
+
+    void StopHauntAudio()
+    {
+        if (!breathSource) return;
+        if (breathSource.clip == hauntBreathingLoop)
+            breathSource.Stop();
+    }
+    bool PlayerLookingAtPriest()
+    {
+        Vector3 toPriest = (transform.position - playerCamera.position).normalized;
+        return Vector3.Dot(playerCamera.forward.normalized, toPriest) > lookDotThreshold;
+    }
+
+    void PlayRandomWhisper()
+    {
+        if (!whisperSource) return;
+
+        // pick between line1 and line2
+        AudioClip clip = null;
+        if (whisperLine1 != null && whisperLine2 != null)
+            clip = (Random.value > 0.5f) ? whisperLine1 : whisperLine2;
+        else if (whisperLine1 != null)
+            clip = whisperLine1;
+        else if (whisperLine2 != null)
+            clip = whisperLine2;
+
+        if (clip == null) return;
+
+        whisperSource.pitch = Random.Range(0.95f, 1.05f);
+        whisperSource.PlayOneShot(clip);
+    }
+
+    void PlayWhisperLine1()
+    {
+        if (!whisperSource || whisperLine1 == null) return;
+
+        // avoid ridiculous overlap spam
+        if (!whisperSource.isPlaying)
+        {
+            whisperSource.pitch = 1f;
+            whisperSource.PlayOneShot(whisperLine1);
+        }
+    }
+
+    void DoWhisperLogic()
+    {
+        if (!whisperSource) return;
+
+        // only whisper when player is NOT staring at him
+        if (!PlayerLookingAtPriest())
+        {
+            // --- random whispers every X–Y seconds ---
+            whisperTimer -= Time.deltaTime;
+            if (whisperTimer <= 0f)
+            {
+                PlayRandomWhisper();
+                whisperTimer = Random.Range(whisperMinDelay, whisperMaxDelay);
+            }
+
+            // --- special line when close ("you shouldn't have come here") ---
+            float dist = FlatDistanceToPlayer();
+            if (dist < hauntStopDistance + 1.5f &&
+                Time.time - lastSpecialWhisperTime > specialWhisperCooldown)
+            {
+                PlayWhisperLine1();
+                lastSpecialWhisperTime = Time.time;
+            }
+        }
+    }
+    void TryJumpScareTrigger()
+    {
+        if (!enableJumpScare || isJumpScaring) return;
+        if (!playerCamera) return;
+
+        Vector3 toPriest = (transform.position - playerCamera.position).normalized;
+        float dot = Vector3.Dot(playerCamera.forward.normalized, toPriest);
+        float cosThreshold = Mathf.Cos(jumpScareViewAngle * Mathf.Deg2Rad);
+
+        if (dot < cosThreshold) return;
+
+        StartJumpScare();
+    }
+
+    void StartJumpScare()
+    {
+        isJumpScaring = true;
+        hasAttacked = true;
+        currentState = State.JumpScare;
+        
+
+        Vector3 camPos = playerCamera.position;
+        Vector3 priestPos = transform.position;
+
+        // Direction: Priest -> Camera on flat ground
+        Vector3 dir = (camPos - priestPos);
+        dir.y = 0f;
+        dir.Normalize();
+
+        // JumpScare target: behind camera on same straight line
+        jumpScareTarget = camPos + dir * jumpScareDistance;
+
+        // Vertical alignment of face
+        jumpScareTarget.y = priestPos.y + jumpScareOffset.y;
+
+        // Face camera while flying
+        transform.LookAt(new Vector3(camPos.x, priestPos.y, camPos.z));
+
+        if (breathSource) breathSource.Stop();
+        if (whisperSource && jumpScareClip)
+            whisperSource.PlayOneShot(jumpScareClip);
+    }
+
+    public void RespawnToSafePoint(bool startInFlee = false)
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("No respawn point set for HybridPriestAI.");
+            return;
+        }
+
+        transform.position = respawnPoint.position;
+        transform.rotation = respawnPoint.rotation;
+
+        isJumpScaring = false;
+        hauntDelayTimer = 0f;
+
+        if (startInFlee)
+        {
+            currentState = State.Flee;
+            fleeTimer = fleeTime;
+
+            // Pick flee direction
+            Vector3 awayDir = (transform.position - player.position).normalized;
+            Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 0f, Random.Range(-0.5f, 0.5f));
+            awayDir = (awayDir + randomOffset).normalized;
+
+            fleeTarget = transform.position + awayDir * fleeDistance;
+
+            Debug.Log("Priest respawned into Flee state.");
+        }
+        else
+        {
+            currentState = State.Orbit;
+            Debug.Log("Priest respawned into Orbit state.");
+        }
+    }
+
+
+
 }

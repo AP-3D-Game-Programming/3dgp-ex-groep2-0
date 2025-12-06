@@ -46,3 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterManager
   priest: {fileID: 0}
   spawnPoint: {fileID: 0}
+  enableAutoRespawn: 1
+  respawnDelay: 15

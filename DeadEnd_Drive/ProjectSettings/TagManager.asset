@@ -8,6 +8,7 @@ TagManager:
   - vehicle
   - Ladder
   - PlayerCamera
+  - Teleport
   layers:
   - Default
   - TransparentFX
