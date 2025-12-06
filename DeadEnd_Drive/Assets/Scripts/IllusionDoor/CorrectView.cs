@@ -2,30 +2,36 @@ using UnityEngine;
 
 public class PortalWindowCamera : MonoBehaviour
 {
-    public Transform playerCamera; // Your real camera (main camera)
-    public Transform plane;        // The plane showing the RenderTexture
-    public float distanceBehindPlane = 5f;
+    public Camera portalCam;
+    public Material portalMat;
+    public Camera playerCam;
+
+    public Transform portalOrigin;     // Your portal's Transform
+    public Transform linkedPortal;     // The other portal's Transform
+
+    void Start()
+    {
+        var rt = new RenderTexture(Screen.width, Screen.height, 24);
+        portalCam.targetTexture = rt;
+        portalMat.mainTexture = rt;
+    }
 
     void LateUpdate()
     {
-        //
-        // 1. Position the portal camera behind the plane
-        //
-        transform.position = plane.position - plane.forward * distanceBehindPlane;
+        // 1. Compute player's position relative to the portal plane
+        Vector3 playerOffset = playerCam.transform.position - portalOrigin.position;
 
-        //
-        // 2. Compute how the player is looking relative to the plane
-        //
-        Vector3 relativeLookDir = plane.InverseTransformDirection(playerCamera.forward);
+        // 2. Transform offset into portal local space
+        Vector3 localOffset = portalOrigin.InverseTransformVector(playerOffset);
 
-        //
-        // 3. Apply that same “relative look direction” to the portal camera
-        //
-        Vector3 portalLookDir = transform.TransformDirection(relativeLookDir);
+        // 3. Mirror offset on Z axis (assuming portal faces +Z)
+        localOffset.z = -localOffset.z;
 
-        //
-        // 4. Rotate the portal camera
-        //
-        transform.rotation = Quaternion.LookRotation(portalLookDir, Vector3.up);
+        // 4. Transform back into world space relative to linked portal
+        portalCam.transform.position = linkedPortal.position + linkedPortal.TransformVector(localOffset);
+
+        // 5. Adjust rotation to mirror portal orientation
+        Quaternion relativeRot = Quaternion.Inverse(portalOrigin.rotation) * playerCam.transform.rotation;
+        portalCam.transform.rotation = linkedPortal.rotation * relativeRot;
     }
 }
