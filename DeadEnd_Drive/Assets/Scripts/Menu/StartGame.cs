@@ -10,7 +10,7 @@ public class StartGame : MonoBehaviour
     public Canvas menuCanvas;
     public Image blackScreen;
 
-    public void StartButton()
+    public void startCall()
     {
         StartCoroutine(DiveAndLoad());
     }
