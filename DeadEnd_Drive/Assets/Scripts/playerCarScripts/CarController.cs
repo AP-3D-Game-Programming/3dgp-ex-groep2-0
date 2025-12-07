@@ -156,6 +156,12 @@ public class CarController : MonoBehaviour
         if (other.CompareTag("StopCarTrigger"))
         {
             StopCarSmooth();
+
+            CarEntry entryScript = other.GetComponent<CarEntry>();
+            if (entryScript != null)
+            {
+                entryScript.isOutOfFuel = true;
+            }
         }
     }
 
