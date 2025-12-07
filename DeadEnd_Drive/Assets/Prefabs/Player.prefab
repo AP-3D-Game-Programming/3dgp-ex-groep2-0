@@ -14,9 +14,8 @@ GameObject:
   - component: {fileID: 1693111432768930164}
   - component: {fileID: 9127690212238348264}
   - component: {fileID: 2435085933395611921}
-  - component: {fileID: 5029915423158288976}
-  - component: {fileID: 311061716572012430}
-  m_Layer: 6
+  - component: {fileID: 3310215019417656621}
+  m_Layer: 0
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -154,31 +153,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a62c16a92010914991f1498413e6356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  jump: {x: 0, y: 2, z: 0}
+  moveForce: 50
+  maxSpeed: 5
+  sprintMultiplier: 1.7
   jumpForce: 2
-  climbSpeed: 3
   isGrounded: 0
   onLadderStairs: 0
---- !u!114 &5029915423158288976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6033250026794681968}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 111291345f433b3469d74153fae248e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyTag: Enemy
-  maxDistance: 50
-  minDistance: 2
-  minPitch: 1
-  maxPitch: 2
-  maxVolume: 1
---- !u!82 &311061716572012430
+  climbSpeed: 3
+  footstepSource: {fileID: 3310215019417656621}
+  walkClip: {fileID: 8300000, guid: 71d3c224ae6b9a04d9714e3c63cb8788, type: 3}
+  runClip: {fileID: 8300000, guid: 85e39b1bd6f6f6e449a7b51ac6fad43d, type: 3}
+  stepIntervalWalk: 0.5
+  stepIntervalRun: 0.35
+--- !u!82 &3310215019417656621
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -189,11 +176,11 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 3beea86966f5b0946833c1b86265ef20, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

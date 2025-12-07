@@ -4,17 +4,26 @@ using UnityEngine;
 public class PlayerCont : MonoBehaviour
 {
     [Header("Movement")]
-    public float speed = 5f;
-    public Vector3 jump = new Vector3(0, 2f, 0);
-    public float jumpForce = 2f;
-    public float climbSpeed = 3f;
+    public float moveForce = 50f;
+    public float maxSpeed = 5f;
+    public float sprintMultiplier = 1.5f;
 
-    [Header("Ground Check")]
-    public bool isGrounded;
-    private bool hasJumped = false;
+    [Header("Jump")]
+    public float jumpForce = 5f;
+    public bool isGrounded = false;
 
     [Header("Ladder/Stairs")]
     public bool onLadderStairs = false;
+    public float climbSpeed = 3f;
+
+    [Header("footstep audio")]
+    public AudioSource footstepSource;
+    public AudioClip walkClip;
+    public AudioClip runClip;
+    public float stepIntervalWalk = 0.5f;
+    public float stepIntervalRun = 0.35f;
+
+    private float stepTimer = 0f;
 
     private Rigidbody rb;
 
@@ -22,11 +31,9 @@ public class PlayerCont : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-    }
 
-    void Update()
-    {
-        HandleJump();
+        footstepSource.loop = true;
+        footstepSource.clip = walkClip;
     }
 
     void FixedUpdate()
@@ -34,47 +41,63 @@ public class PlayerCont : MonoBehaviour
         HandleMovement();
     }
 
+    void Update()
+    {
+        HandleJump();
+    }
+
     void HandleMovement()
     {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        // Movement relative to player forward
-        Vector3 moveDir = new Vector3(h, 0, v);
-        Vector3 worldMove = transform.TransformDirection(moveDir).normalized;
+        // direction relative to player
+        Vector3 moveDir = transform.TransformDirection(new Vector3(h, 0, v));
+
+        float currentMultiplier = Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f;
 
         if (onLadderStairs)
         {
             rb.useGravity = false;
-            // Horizontal moves normally, vertical controlled by climbSpeed
-            rb.linearVelocity = new Vector3(worldMove.x * speed, climbSpeed, worldMove.z * speed);
+            rb.linearVelocity = new Vector3(
+                moveDir.x * maxSpeed,
+                climbSpeed,
+                moveDir.z * maxSpeed
+            );
+            return;
         }
         else
         {
             rb.useGravity = true;
-            // Horizontal moves normally, vertical comes from gravity/jump
-            rb.linearVelocity = new Vector3(worldMove.x * speed, rb.linearVelocity.y, worldMove.z * speed);
         }
+
+        rb.AddForce(moveDir * moveForce * currentMultiplier);
+
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        if (horizontalVelocity.magnitude > maxSpeed * currentMultiplier)
+        {
+            Vector3 limited = horizontalVelocity.normalized * maxSpeed * currentMultiplier;
+            rb.linearVelocity = new Vector3(limited.x, rb.linearVelocity.y, limited.z);
+        }
+        HandleFootsteps(horizontalVelocity.magnitude, currentMultiplier);
     }
 
     void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !hasJumped && !onLadderStairs)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !onLadderStairs)
         {
-            rb.AddForce(jump * jumpForce, ForceMode.Impulse);
-            hasJumped = true;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
 
     void OnCollisionStay(Collision collision)
     {
-        foreach (ContactPoint contact in collision.contacts)
+        foreach (ContactPoint c in collision.contacts)
         {
-            if (Vector3.Dot(contact.normal, Vector3.up) > 0.5f)
+            if (Vector3.Dot(c.normal, Vector3.up) > 0.5f)
             {
                 isGrounded = true;
-                hasJumped = false;
-                break;
+                return;
             }
         }
     }
@@ -84,19 +107,26 @@ public class PlayerCont : MonoBehaviour
         isGrounded = false;
     }
 
-    void OnTriggerEnter(Collider other)
+    void HandleFootsteps(float speed, float multiplier)
     {
-        if (other.CompareTag("Ladder"))
+        if (!isGrounded || speed < 0.2f || onLadderStairs)
         {
-            onLadderStairs = true;
+            footstepSource.Pause();
+            return;
         }
+
+        bool isRunning = multiplier > 1f;
+        AudioClip clip = isRunning ? runClip : walkClip;
+
+        if (footstepSource.clip != clip)
+        {
+            footstepSource.clip = clip;
+            footstepSource.Play();
+        }
+
+        footstepSource.pitch = Random.Range(0.95f, 1.05f);
+        if (!footstepSource.isPlaying)
+            footstepSource.Play();
     }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Ladder"))
-        {
-            onLadderStairs = false;
-        }
-    }
 }

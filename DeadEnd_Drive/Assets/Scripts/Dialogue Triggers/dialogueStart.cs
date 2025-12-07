@@ -12,7 +12,7 @@ public class StartDialogue : MonoBehaviour
     {
         if (dialogueText != null)
         {
-            dialogueText.text = "Gas is empty… dammit. Maybe I can find something usefull in there";
+            dialogueText.text = "Gas almost empty… dammit.";
             dialogueText.alpha = 1f;
             StartCoroutine(FadeOut());
         }

@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class AddSceneLoader : MonoBehaviour
+public class Startup : MonoBehaviour
 {
     public string sceneName = "";
+    public CarEntry carEntryScript;
     void Start()
     {
+        carEntryScript.EnterVehicle();
         LoadSecondSceneAdditive();
     }
     public void LoadSecondSceneAdditive()

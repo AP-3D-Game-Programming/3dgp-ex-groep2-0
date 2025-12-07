@@ -79,7 +79,7 @@ public class CarEntry : MonoBehaviour
     }
 
 
-private void HandlePlayerExit()
+    private void HandlePlayerExit()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -87,24 +87,29 @@ private void HandlePlayerExit()
         }
     }
 
-    private void EnterVehicle()
+    public void EnterVehicle()
     {
+
+        if (player == null || driverSeat == null || vehicle == null)
+        {
+            Debug.LogError("CarEntry references not assigned!");
+            return;
+        }
+
+        if (playerRb == null)
+            playerRb = player.GetComponent<Rigidbody>();
         isInVehicle = true;
 
-        // Disable player movement
         player.GetComponent<PlayerCont>().enabled = false;
         playerRb.detectCollisions = false;
 
-        // Parent player to driver seat
         player.SetParent(driverSeat);
         player.localPosition = Vector3.zero;
         player.localRotation = Quaternion.identity;
 
-        // Lock physics while in seat
         playerRb.isKinematic = true;
         playerRb.constraints = RigidbodyConstraints.FreezeAll;
 
-        // Reset car damping to normal driving values
         Rigidbody carRb = vehicle.GetComponent<Rigidbody>();
         if (carRb != null)
         {

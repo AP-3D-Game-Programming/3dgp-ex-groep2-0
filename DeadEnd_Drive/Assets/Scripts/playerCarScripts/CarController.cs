@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using System.Collections; // for IEnumerator
 
 public class CarController : MonoBehaviour
 {
@@ -34,6 +35,7 @@ public class CarController : MonoBehaviour
     float steerInput;
 
     private Rigidbody carRb;
+    public bool isStoppedByTrigger = false;
 
     void Start()
     {
@@ -61,6 +63,7 @@ public class CarController : MonoBehaviour
     }
     void Move()
     {
+        if (isStoppedByTrigger) return;
         float speedFactor = Mathf.Clamp01((maxSpeed - carRb.linearVelocity.magnitude) / maxSpeed);
         foreach (var wheel in wheels)
         {
@@ -83,6 +86,15 @@ public class CarController : MonoBehaviour
 
     void HandleBrakingAndReverse()
     {
+        if (isStoppedByTrigger) // stop all input
+        {
+            foreach (var wheel in wheels)
+            {
+                wheel.wheelCollider.motorTorque = 0f;
+                wheel.wheelCollider.brakeTorque = 600f; // keep brakes applied
+            }
+            return;
+        }
         float forwardSpeed = Vector3.Dot(carRb.linearVelocity, transform.forward);
         float speedFactor = Mathf.Clamp01((maxSpeed - carRb.linearVelocity.magnitude) / maxSpeed);
 
@@ -138,4 +150,47 @@ public class CarController : MonoBehaviour
             wheel.WheelModel.transform.rotation = rot;
         }
     }
+    //--force stop for fuel empty
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("StopCarTrigger"))
+        {
+            StopCarSmooth();
+        }
+    }
+
+    public void StopCarSmooth(float stopDuration = 0.5f)
+    {
+        StartCoroutine(GradualStop(stopDuration));
+    }
+
+    private IEnumerator GradualStop(float duration)
+    {
+        isStoppedByTrigger = true;
+
+        float elapsed = 0f;
+
+        float targetBrakeTorque = 600f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+
+            foreach (var wheel in wheels)
+            {
+                wheel.wheelCollider.motorTorque = 0f;
+                wheel.wheelCollider.brakeTorque = Mathf.Lerp(0f, targetBrakeTorque, t);
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        foreach (var wheel in wheels)
+        {
+            wheel.wheelCollider.motorTorque = 0f;
+            wheel.wheelCollider.brakeTorque = targetBrakeTorque;
+        }
+    }
+
 }
