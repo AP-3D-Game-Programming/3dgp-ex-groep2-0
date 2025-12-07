@@ -9,6 +9,7 @@ TagManager:
   - Ladder
   - PlayerCamera
   - Teleport
+  - StopCarTrigger
   layers:
   - Default
   - TransparentFX

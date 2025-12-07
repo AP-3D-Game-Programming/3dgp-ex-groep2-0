@@ -34,30 +34,33 @@ public class Pickup : MonoBehaviour
     {
         if (pickedUp) return; // stop logic after pickup
 
-        float dist = Vector3.Distance(player.position, transform.position);
-
-        if (dist <= pickupRange)
+        if (rb != null)
         {
-            if (pickupText) pickupText.gameObject.SetActive(true);
+            float dist = Vector3.Distance(player.position, transform.position);
 
-            if (Input.GetKeyDown(pickupKey))
+            if (dist <= pickupRange)
             {
-                pickedUp = true;
+                if (pickupText) pickupText.gameObject.SetActive(true);
 
-                rb.gameObject.SetActive(false);
-                teleporter.gameObject.SetActive(true);
+                if (Input.GetKeyDown(pickupKey))
+                {
+                    pickedUp = true;
 
-                if (pickupText) pickupText.gameObject.SetActive(false);
-                doorController.SlamShut(1.5f);
+                    rb.gameObject.SetActive(false);
+                    teleporter.gameObject.SetActive(true);
+
+                    if (pickupText) pickupText.gameObject.SetActive(false);
+                    doorController.SlamShut(1.5f);
 
 
 
-                //StartCoroutine(ShowJumpscare());
+                    //StartCoroutine(ShowJumpscare());
+                }
             }
-        }
-        else
-        {
-            if (pickupText) pickupText.gameObject.SetActive(false);
+            else
+            {
+                if (pickupText) pickupText.gameObject.SetActive(false);
+            }
         }
 
     }
