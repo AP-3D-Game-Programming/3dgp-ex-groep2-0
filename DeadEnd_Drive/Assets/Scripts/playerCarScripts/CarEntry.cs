@@ -5,6 +5,8 @@ using System.Collections;
 
 public class CarEntry : MonoBehaviour
 {
+    [Header("Settings")]
+    public bool startInsideCar = false;
     [Header("References")]
     public Transform player;
     public Transform vehicle;
@@ -28,6 +30,13 @@ public class CarEntry : MonoBehaviour
         carEntry.gameObject.SetActive(false);
         playerRb = player.GetComponent<Rigidbody>();
         src = gameObject.GetComponent<AudioSource>();
+
+        if (startInsideCar)
+        {
+            EnterVehicle();
+
+            StartCoroutine(StartEngineRoutine());
+        }
     }
 
     void Update()

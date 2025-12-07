@@ -14470,6 +14470,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 680580828}
     - target: {fileID: 256106787463315990, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
+      propertyPath: startInsideCar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 256106787463315990, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
       propertyPath: CameraController
       value: 
       objectReference: {fileID: 228474524}
