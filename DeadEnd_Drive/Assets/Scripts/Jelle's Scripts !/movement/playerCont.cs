@@ -20,11 +20,6 @@ public class PlayerCont : MonoBehaviour
     public AudioSource footstepSource;
     public AudioClip walkClip;
     public AudioClip runClip;
-    public float stepIntervalWalk = 0.5f;
-    public float stepIntervalRun = 0.35f;
-
-    private float stepTimer = 0f;
-
     private Rigidbody rb;
 
     void Start()
@@ -52,18 +47,24 @@ public class PlayerCont : MonoBehaviour
         float v = Input.GetAxis("Vertical");
 
         // direction relative to player
-        Vector3 moveDir = transform.TransformDirection(new Vector3(h, 0, v));
+        Vector3 moveDir = transform.TransformDirection(new Vector3(h, 0, v)).normalized;
 
         float currentMultiplier = Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f;
 
         if (onLadderStairs)
         {
             rb.useGravity = false;
-            rb.linearVelocity = new Vector3(
-                moveDir.x * maxSpeed,
-                climbSpeed,
-                moveDir.z * maxSpeed
+
+            // vertical movement based on input
+            float verticalInput = Input.GetAxis("Vertical"); // W/S or Up/Down
+
+            Vector3 climbVelocity = new Vector3(
+                moveDir.x * maxSpeed,        // horizontal X
+                verticalInput * climbSpeed,  // vertical Y
+                moveDir.z * maxSpeed         // horizontal Z
             );
+
+            rb.linearVelocity = climbVelocity;
             return;
         }
         else
@@ -71,15 +72,22 @@ public class PlayerCont : MonoBehaviour
             rb.useGravity = true;
         }
 
-        rb.AddForce(moveDir * moveForce * currentMultiplier);
-
-        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        if (horizontalVelocity.magnitude > maxSpeed * currentMultiplier)
+        if (Mathf.Approximately(h, 0f) && Mathf.Approximately(v, 0f))
         {
-            Vector3 limited = horizontalVelocity.normalized * maxSpeed * currentMultiplier;
-            rb.linearVelocity = new Vector3(limited.x, rb.linearVelocity.y, limited.z);
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
         }
-        HandleFootsteps(horizontalVelocity.magnitude, currentMultiplier);
+        else
+        {
+            // Velocity-based movement
+            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+            Vector3 targetVelocity = moveDir * maxSpeed * currentMultiplier;
+            Vector3 velocityChange = targetVelocity - horizontalVelocity;
+
+            rb.AddForce(velocityChange, ForceMode.VelocityChange);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, rb.linearVelocity.z);
+        }
+
+        HandleFootsteps(moveDir.magnitude * maxSpeed * currentMultiplier, currentMultiplier);
     }
 
     void HandleJump()
@@ -127,6 +135,22 @@ public class PlayerCont : MonoBehaviour
         footstepSource.pitch = Random.Range(0.95f, 1.05f);
         if (!footstepSource.isPlaying)
             footstepSource.Play();
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            onLadderStairs = true;
+            rb.linearVelocity = Vector3.zero; // stop any existing momentum
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            onLadderStairs = false;
+        }
     }
 
 }
