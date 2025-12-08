@@ -5,6 +5,10 @@ using System.Collections;
 
 public class CarEntry : MonoBehaviour
 {
+    [Header("Settings")]
+    public bool startInsideCar = false;
+    public bool isOutOfFuel = false;
+
     [Header("References")]
     public Transform player;
     public Transform vehicle;
@@ -14,6 +18,7 @@ public class CarEntry : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI carEntry;
+    public TextMeshProUGUI gasEmptyText;
 
     private bool isInVehicle = false;
     private Rigidbody playerRb;
@@ -25,9 +30,17 @@ public class CarEntry : MonoBehaviour
 
     void Start()
     {
+        if(gasEmptyText != null) gasEmptyText.gameObject.SetActive(false);
         carEntry.gameObject.SetActive(false);
         playerRb = player.GetComponent<Rigidbody>();
         src = gameObject.GetComponent<AudioSource>();
+
+        if (startInsideCar)
+        {
+            EnterVehicle();
+
+            StartCoroutine(StartEngineRoutine());
+        }
     }
 
     void Update()
@@ -153,6 +166,24 @@ public class CarEntry : MonoBehaviour
         if (carRb != null)
         {
             StartCoroutine(GradualStop(carRb));
+        }
+
+        if (isOutOfFuel)
+        {
+            StartCoroutine(ShowDialogueRoutine());
+        }
+    }
+
+    private IEnumerator ShowDialogueRoutine()
+    {
+        if (gasEmptyText != null)
+        {
+            gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house.";
+            gasEmptyText.gameObject.SetActive(true);
+
+            yield return new WaitForSeconds(4f);
+
+            gasEmptyText.gameObject.SetActive(false);
         }
     }
 
