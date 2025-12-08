@@ -163,8 +163,6 @@ MonoBehaviour:
   footstepSource: {fileID: 3310215019417656621}
   walkClip: {fileID: 8300000, guid: 71d3c224ae6b9a04d9714e3c63cb8788, type: 3}
   runClip: {fileID: 8300000, guid: 85e39b1bd6f6f6e449a7b51ac6fad43d, type: 3}
-  stepIntervalWalk: 0.5
-  stepIntervalRun: 0.35
 --- !u!82 &3310215019417656621
 AudioSource:
   m_ObjectHideFlags: 0
@@ -311,7 +309,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7632804488653378748}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
