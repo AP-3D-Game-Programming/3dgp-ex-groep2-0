@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 8240013563441638644, guid: e19eb9f284ffaf348ba814417f501b47, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -196,7 +200,7 @@ GameObject:
   - component: {fileID: 418409408}
   - component: {fileID: 418409407}
   - component: {fileID: 418409406}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304,7 +308,7 @@ GameObject:
   - component: {fileID: 574696833}
   - component: {fileID: 574696832}
   - component: {fileID: 574696831}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (8)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -412,7 +416,7 @@ GameObject:
   - component: {fileID: 1103553134}
   - component: {fileID: 1103553133}
   - component: {fileID: 1103553132}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -793,7 +797,7 @@ GameObject:
   - component: {fileID: 2071472247}
   - component: {fileID: 2071472246}
   - component: {fileID: 2071472245}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube (7)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -897,6 +901,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3310215019417656621, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: 3beea86966f5b0946833c1b86265ef20, type: 3}
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.5946817
@@ -941,6 +949,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6033250026794681968, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -958,6 +970,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1788990421}
+    - target: {fileID: 90974114583507779, guid: 0b949a6a94f425346ab19d758ece2a77, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8539400272538685816, guid: 0b949a6a94f425346ab19d758ece2a77, type: 3}
       propertyPath: m_Name
       value: Zombie
