@@ -3,34 +3,43 @@ using UnityEngine;
 public class ProximityHeartbeat : MonoBehaviour
 {
     [Header("Instellingen")]
-    public string enemyTag = "Enemy"; // Zorg dat je zombie deze Tag heeft!
-    public float maxDistance = 50f;   // Vanaf hier begint het geluid
-    public float minDistance = 2f;    // Hier is het geluid op zijn hardst/snelst
+    public string enemyTag = "Enemy"; 
+    public float maxDistance = 50f;   
+    public float minDistance = 2f;    
 
     [Header("Audio Effect")]
-    public float minPitch = 1.0f;     // Normale snelheid (ver weg)
-    public float maxPitch = 3.0f;     // Snelle snelheid (dichtbij)
-    public float maxVolume = 5f;    // Maximaal volume
+    public float minPitch = 1.0f;     
+    public float maxPitch = 3.0f;     
+    [Range(0f, 1f)]                   // Zorgt voor een slider in Unity (veiliger)
+    public float maxVolume = 10f;      // Aangepast naar 1 (Unity volume gaat normaal van 0 tot 1)
 
-    private AudioSource audioSource;
+    [Header("Sleep hier je Audio Source in")]
+    public AudioSource audioSource;   // <--- DEZE IS NU PUBLIC
+
     private GameObject[] enemies;
     private float checkTimer;
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+        // De regel 'audioSource = GetComponent<AudioSource>();' is WEGGEHAALD.
+        // We gebruiken nu degene die jij in de inspector sleept.
+
+        // Veiligheidscheck: als je vergeten bent te slepen, geven we een error.
+        if (audioSource == null)
+        {
+            Debug.LogError("VERGEET NIET de Audio Source in het script te slepen!");
+            return;
+        }
         
-        // Zorg dat het geluid loopt (zodat we pitch kunnen aanpassen)
         audioSource.loop = true;
         audioSource.playOnAwake = true;
-        audioSource.volume = 0; // Begin stil
+        audioSource.volume = 0; 
         
         if (!audioSource.isPlaying) audioSource.Play();
     }
 
     void Update()
     {
-        // Optimalisatie: Zoek niet elke frame naar enemies, maar elke 0.5 seconde
         checkTimer += Time.deltaTime;
         if (checkTimer > 0.5f)
         {
@@ -38,7 +47,6 @@ public class ProximityHeartbeat : MonoBehaviour
             checkTimer = 0;
         }
 
-        // Zoek de dichtstbijzijnde zombie
         float closestDistance = Mathf.Infinity;
         GameObject closestEnemy = null;
 
@@ -57,29 +65,22 @@ public class ProximityHeartbeat : MonoBehaviour
             }
         }
 
-        // Pas het geluid aan
         HandleAudio(closestDistance);
     }
 
     void HandleAudio(float distance)
     {
-        // Als er geen zombie is of hij is te ver weg
+        if (audioSource == null) return;
+
         if (distance >= maxDistance)
         {
-            // Laat het volume langzaam naar 0 zakken (Fade out)
             audioSource.volume = Mathf.Lerp(audioSource.volume, 0f, Time.deltaTime * 2f);
             return;
         }
 
-        // Bereken percentage: 0 = ver weg, 1 = heel dichtbij
-        // We gebruiken Mathf.InverseLerp om de afstand om te zetten naar een getal tussen 0 en 1
         float proximity = Mathf.InverseLerp(maxDistance, minDistance, distance);
 
-        // Zet volume (hoe dichterbij, hoe harder)
         audioSource.volume = proximity * maxVolume;
-
-        // Zet snelheid/pitch (hoe dichterbij, hoe hoger/sneller)
-        // Lerp berekent de waarde tussen minPitch en maxPitch op basis van proximity
         audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, proximity);
     }
 }
