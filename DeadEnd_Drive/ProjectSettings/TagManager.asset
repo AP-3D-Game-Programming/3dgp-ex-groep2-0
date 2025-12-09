@@ -10,6 +10,7 @@ TagManager:
   - PlayerCamera
   - Teleport
   - StopCarTrigger
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - UI
   - Player
   - Enemy
-  - 
+  - Obstacles
   - 
   - 
   - 
