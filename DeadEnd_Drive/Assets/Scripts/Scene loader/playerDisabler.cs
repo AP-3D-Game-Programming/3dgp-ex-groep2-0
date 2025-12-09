@@ -1,9 +1,12 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class DisableAtStart : MonoBehaviour
 {
     public GameObject player; // assign the additive scene's player
     public Camera cam;        // assign the additive scene's camera
+
+    public GameObject eventSys;
 
     private AudioListener audioListener;
 
@@ -20,6 +23,11 @@ public class DisableAtStart : MonoBehaviour
             audioListener = cam.GetComponent<AudioListener>();
             if (audioListener != null)
                 audioListener.enabled = false;
+        }
+
+        if (eventSys != null)
+        {
+            eventSys.SetActive(false);
         }
     }
 
@@ -41,6 +49,11 @@ public class DisableAtStart : MonoBehaviour
             cam.enabled = true;
             if (audioListener != null)
                 audioListener.enabled = true;
+        }
+
+        if (eventSys)
+        {
+            eventSys.SetActive(true);
         }
     }
 }

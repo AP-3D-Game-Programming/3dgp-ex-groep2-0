@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using System.Collections; // for IEnumerator
+using System.Collections;
+using TMPro; // for IEnumerator
 
 public class CarController : MonoBehaviour
 {
+    public TextMeshProUGUI exitText;
     public enum Axel
     {
         Front,
@@ -155,6 +157,7 @@ public class CarController : MonoBehaviour
     {
         if (other.CompareTag("StopCarTrigger"))
         {
+            exitText.gameObject.SetActive(true);
             StopCarSmooth();
 
             CarEntry entryScript = other.GetComponent<CarEntry>();

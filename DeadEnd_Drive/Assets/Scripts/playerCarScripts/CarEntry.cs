@@ -30,7 +30,7 @@ public class CarEntry : MonoBehaviour
 
     void Start()
     {
-        if(gasEmptyText != null) gasEmptyText.gameObject.SetActive(false);
+        if (gasEmptyText != null) gasEmptyText.gameObject.SetActive(false);
         carEntry.gameObject.SetActive(false);
         playerRb = player.GetComponent<Rigidbody>();
         src = gameObject.GetComponent<AudioSource>();
@@ -52,6 +52,7 @@ public class CarEntry : MonoBehaviour
         else
         {
             HandlePlayerExit();
+            carEntry.gameObject.SetActive(false);
         }
     }
 
