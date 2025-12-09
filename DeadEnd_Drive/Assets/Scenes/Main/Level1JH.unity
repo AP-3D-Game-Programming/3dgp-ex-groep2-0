@@ -9267,6 +9267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1851691381}
   cam: {fileID: 1131733507}
+  eventSys: {fileID: 822862123}
 --- !u!1 &2005403329
 GameObject:
   m_ObjectHideFlags: 0
