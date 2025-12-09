@@ -21,7 +21,7 @@ public class PortalWindowCamera : MonoBehaviour
         Vector3 playerOffset = playerCam.transform.position - portalOrigin.position;
         Vector3 localOffset = portalOrigin.InverseTransformVector(playerOffset);
 
-        portalCam.transform.position = linkedPortal.position - linkedPortal.TransformVector(localOffset);
+        portalCam.transform.position = linkedPortal.position + linkedPortal.TransformVector(localOffset);
 
         Quaternion relativeRot = Quaternion.Inverse(portalOrigin.rotation) * playerCam.transform.rotation;
         portalCam.transform.rotation = linkedPortal.rotation * relativeRot;
