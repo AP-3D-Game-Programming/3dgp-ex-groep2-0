@@ -8873,14 +8873,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1470986689128202810, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2946728770057661193, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4083751344360330646, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_LocalPosition.x
       value: 378.14
@@ -8924,10 +8916,6 @@ PrefabInstance:
     - target: {fileID: 6033250026794681968, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 6033250026794681968, guid: c1b97e4a3db554642b676b2b47236201, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9279,6 +9267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1851691381}
   cam: {fileID: 1131733507}
+  eventSys: {fileID: 822862123}
 --- !u!1 &2005403329
 GameObject:
   m_ObjectHideFlags: 0
