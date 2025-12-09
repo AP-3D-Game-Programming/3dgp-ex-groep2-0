@@ -68,6 +68,7 @@ public class MonsterStandard : MonoBehaviour
         {
             agent.SetDestination(lastKnownPlayerPosition);
             pathUpdateTimer = 0;
+            agent.speed = 5;
         }
 
         // Check of we er zijn EN de speler kwijt zijn
