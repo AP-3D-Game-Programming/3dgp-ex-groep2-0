@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000002, guid: b2096a5c2235a0a48a9af9a3a42f4b87, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: c1ccb591714849a47b52d99a23fb553a, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 84a5e050fc279fc4fa1f22996fef7d48, type: 2}
 --- !u!196 &5
 NavMeshSettings:
@@ -2626,7 +2626,9 @@ MonoBehaviour:
   pickupKey: 101
   pickupText: {fileID: 1508944494}
   jumpscareImage: {fileID: 1647924289}
+  doorController: {fileID: 0}
   clip: {fileID: 8300000, guid: cd22852f72597ad438384cfed01854e9, type: 3}
+  teleporter: {fileID: 0}
 --- !u!82 &1122971208
 AudioSource:
   m_ObjectHideFlags: 0
