@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main/Level2JH.unity
     guid: b7f8a649fc6acbe47955984fe46f809b
+  - enabled: 1
+    path: Assets/Scenes/RyanFolder/RyanLevel_1.unity
+    guid: 9cfb14b4aea9e9c4d9a9848e902e7452
+  - enabled: 1
+    path: Assets/Scenes/RyanFolder/RyanLevel_2.unity
+    guid: eaa336ba2d2432648a713c642ee5b580
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
