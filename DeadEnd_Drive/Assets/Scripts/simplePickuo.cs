@@ -2,7 +2,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.Animations.Rigging;
 
 public class Pickup : MonoBehaviour
 {
@@ -13,18 +12,32 @@ public class Pickup : MonoBehaviour
     public Image jumpscareImage;
     public DoorController doorController;
 
-    private Transform player;
+    public Transform player;
     private bool pickedUp = false;
     private Rigidbody rb;
 
     public AudioClip clip;
     public GameObject teleporter;
 
+    // Voeg deze toe om het object onzichtbaar te maken
+    private MeshRenderer meshRenderer;
+    private Collider objCollider;
+
     void Start()
     {
         teleporter.gameObject.SetActive(false);
         rb = GetComponent<Rigidbody>();
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        
+        // We pakken de renderer en collider om ze straks uit te zetten
+        meshRenderer = GetComponent<MeshRenderer>();
+        objCollider = GetComponent<Collider>();
+
+        // Jouw veilige player check
+        if (player == null) 
+        {
+            var foundPlayer = GameObject.FindGameObjectWithTag("Player");
+            if (foundPlayer != null) player = foundPlayer.transform;
+        }
 
         if (pickupText) pickupText.gameObject.SetActive(false);
         if (jumpscareImage) jumpscareImage.gameObject.SetActive(false);
@@ -32,9 +45,11 @@ public class Pickup : MonoBehaviour
 
     void Update()
     {
-        if (pickedUp) return; // stop logic after pickup
+        // Als we hem al hebben opgepakt, doen we NIETS meer in Update.
+        // De Coroutine handelt de rest af.
+        if (pickedUp) return; 
 
-        if (rb != null)
+        if (player != null) // Extra check om crash te voorkomen
         {
             float dist = Vector3.Distance(player.position, transform.position);
 
@@ -44,17 +59,7 @@ public class Pickup : MonoBehaviour
 
                 if (Input.GetKeyDown(pickupKey))
                 {
-                    pickedUp = true;
-
-                    rb.gameObject.SetActive(false);
-                    teleporter.gameObject.SetActive(true);
-
-                    if (pickupText) pickupText.gameObject.SetActive(false);
-                    doorController.SlamShut(1.5f);
-
-
-
-                    //StartCoroutine(ShowJumpscare());
+                    HandlePickup(); // We maken een aparte functie voor netheid
                 }
             }
             else
@@ -62,17 +67,49 @@ public class Pickup : MonoBehaviour
                 if (pickupText) pickupText.gameObject.SetActive(false);
             }
         }
-
     }
 
-    /*IEnumerator ShowJumpscare()
+    void HandlePickup()
     {
-        AudioSource src = gameObject.GetComponent<AudioSource>();
-        src.PlayOneShot(this.clip);
-        jumpscareImage.gameObject.SetActive(true);
-        yield return new WaitForSeconds(1f);
-        jumpscareImage.gameObject.SetActive(false);
+        pickedUp = true;
 
-        Destroy(gameObject); // NOW safe to destroy
-    }*/
+        // 1. Tekst weg
+        if (pickupText) pickupText.gameObject.SetActive(false);
+
+        // 2. Teleporter aan
+        if (teleporter) teleporter.gameObject.SetActive(true);
+
+        // 3. Deur dicht
+        if (doorController) doorController.SlamShut(1.5f);
+
+        // 4. BELANGRIJK: Maak object onzichtbaar, maar zet het NIET uit!
+        if (meshRenderer) meshRenderer.enabled = false; // Plaatje weg
+        if (objCollider) objCollider.enabled = false;   // Botsing weg
+        if (rb) rb.isKinematic = true; // Zorg dat hij niet meer valt
+
+        // 5. Start de jumpscare correct
+        StartCoroutine(ShowJumpscare());
+    }
+
+    IEnumerator ShowJumpscare()
+    {
+        // Geluid afspelen
+        AudioSource src = GetComponent<AudioSource>();
+        if (src != null && clip != null)
+        {
+            src.PlayOneShot(clip);
+        }
+
+        // Plaatje tonen
+        if (jumpscareImage) jumpscareImage.gameObject.SetActive(true);
+
+        // Wacht 1 seconde (terwijl het script nog leeft!)
+        yield return new WaitForSeconds(1f);
+
+        // Plaatje weer weg
+        if (jumpscareImage) jumpscareImage.gameObject.SetActive(false);
+
+        // NU pas vernietigen we het object definitief
+        Destroy(gameObject); 
+    }
 }
