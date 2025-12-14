@@ -2,12 +2,17 @@ using System;
 using TMPro;
 using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class CarEntry : MonoBehaviour
 {
     [Header("Settings")]
     public bool startInsideCar = false;
     public bool isOutOfFuel = false;
+
+    [Header("Ride Settings")]
+
+    public float rideDuration = 20f;
 
     [Header("References")]
     public Transform player;
@@ -21,6 +26,7 @@ public class CarEntry : MonoBehaviour
     public TextMeshProUGUI gasEmptyText;
 
     private bool isInVehicle = false;
+    private bool isRideInProgress = false;
     private Rigidbody playerRb;
 
     [Header("Sound")]
@@ -51,8 +57,16 @@ public class CarEntry : MonoBehaviour
         }
         else
         {
+
+            if (isRideInProgress)
+            {
+                carEntry.gameObject.SetActive(false);
+                return;
+            }
+
+            carEntry.gameObject.SetActive(true);
             HandlePlayerExit();
-            carEntry.gameObject.SetActive(false);
+
         }
     }
 
@@ -60,6 +74,7 @@ public class CarEntry : MonoBehaviour
     {
         if (Vector3.Distance(player.position, carDoor.position) < 3f)
         {
+            carEntry.text = "Press F to Enter";
             carEntry.gameObject.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.F))
@@ -73,6 +88,17 @@ public class CarEntry : MonoBehaviour
         {
             carEntry.gameObject.SetActive(false);
         }
+    }
+
+    private IEnumerator RideSequence()
+    {
+        isRideInProgress = true;
+
+        yield return new WaitForSeconds(rideDuration);
+
+        isRideInProgress = false;
+
+        carEntry.text = "Press F to Exit";
     }
 
     private IEnumerator StartEngineRoutine()
@@ -114,6 +140,8 @@ public class CarEntry : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody>();
         isInVehicle = true;
 
+        StartCoroutine(RideSequence());
+
         player.GetComponent<PlayerCont>().enabled = false;
         playerRb.detectCollisions = false;
 
@@ -139,6 +167,9 @@ public class CarEntry : MonoBehaviour
     {
         src.Stop();
         isInVehicle = false;
+
+        carEntry.text = "Press F to Enter";
+        carEntry.gameObject.SetActive(false);
 
         if (player.GetComponent<PlayerCont>() != null)
         {
@@ -179,7 +210,7 @@ public class CarEntry : MonoBehaviour
     {
         if (gasEmptyText != null)
         {
-            gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house.";
+            gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house. (don't enter the car again, softlock)";
             gasEmptyText.gameObject.SetActive(true);
 
             yield return new WaitForSeconds(4f);
