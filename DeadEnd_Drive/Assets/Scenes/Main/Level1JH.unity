@@ -888,7 +888,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3230663616885565786, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1104801776}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8646438731835507342, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 243017329}
   m_SourcePrefab: {fileID: 100100000, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
 --- !u!4 &243017326 stripped
 Transform:
@@ -900,12 +903,31 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 256106787463315990, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
   m_PrefabInstance: {fileID: 243017325}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 243017328}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 883213774b4b0024387917dc7074dbea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &243017328 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8646438731835507342, guid: e1796f6cd49a10e4080417f0da90de6e, type: 3}
+  m_PrefabInstance: {fileID: 243017325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &243017329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243017328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 741546b78aa89c442932962bf83d3617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  carEntry: {fileID: 243017327}
+  Prompt: {fileID: 1102425871}
 --- !u!1001 &277033048
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2888,8 +2910,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 545244283}
-  - {fileID: 1102425870}
   - {fileID: 1895218188}
+  - {fileID: 1102425870}
   m_Father: {fileID: 1131733508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3645,7 +3667,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -149}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1102425871
@@ -3733,7 +3755,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -106.61807, y: 0, z: -113.96832, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4357,6 +4379,53 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1307338015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1307338017}
+  - component: {fileID: 1307338018}
+  m_Layer: 0
+  m_Name: startDiologue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1307338017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1307338015}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 504.47247, y: 20, z: 595.3789}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1307338018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1307338015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0616dd4cad902cf4282cabae84113890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogueText: {fileID: 1102425871}
+  displayTime: 3
+  fadeSpeed: 1
 --- !u!1 &1314738044
 GameObject:
   m_ObjectHideFlags: 0
@@ -10863,3 +10932,4 @@ SceneRoots:
   - {fileID: 162727304}
   - {fileID: 1298355641}
   - {fileID: 822955496}
+  - {fileID: 1307338017}

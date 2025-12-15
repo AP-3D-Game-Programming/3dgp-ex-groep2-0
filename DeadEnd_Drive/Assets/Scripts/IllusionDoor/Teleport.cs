@@ -18,16 +18,29 @@ public class TeleportOnTouch : MonoBehaviour
         if (oldCam != null)
             oldCam.enabled = false;
 
-        // Find the scene controller in the additive scene
-        foreach (GameObject rootObj in SceneManager.GetSceneByName(additiveSceneName).GetRootGameObjects())
+        // --- HIER BEGINT DE LOOP ---
+        // We lopen door alle hoofd-objecten in de andere scene
+        Scene targetScene = SceneManager.GetSceneByName(additiveSceneName);
+        if (targetScene.IsValid()) // Check of scene geladen is voor de zekerheid
         {
-            DisableAtStart controller = rootObj.GetComponentInChildren<DisableAtStart>();
-            if (controller != null)
+            foreach (GameObject rootObj in targetScene.GetRootGameObjects())
             {
-                controller.EnablePlayerAndCamera(spawnPoint);
-                break;
+                // 1. Zoek de Player Controller (DisableAtStart)
+                DisableAtStart controller = rootObj.GetComponentInChildren<DisableAtStart>();
+                if (controller != null)
+                {
+                    controller.EnablePlayerAndCamera(spawnPoint);
+                }
+
+                // 2. Zoek het Dialoog script (DIT MOET OOK BINNEN DE LOOP)
+                StartDialogueLevel1 dialogue = rootObj.GetComponentInChildren<StartDialogueLevel1>();
+                if (dialogue != null)
+                {
+                    dialogue.ShowDialogue();
+                }
             }
         }
+        // --- HIER EINDIGT DE LOOP (pas hier mag het haakje staan) ---
 
         // Unload old scene
         SceneManager.UnloadSceneAsync(other.gameObject.scene);
