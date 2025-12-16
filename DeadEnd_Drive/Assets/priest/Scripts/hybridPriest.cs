@@ -15,7 +15,7 @@ public class HybridPriestAI : MonoBehaviour
     public float fallThresholdY = 1000f; // If priest falls below this, we respawn
 
 
-[Header("Audio Volumes")]
+    [Header("Audio Volumes")]
     [Range(0f, 1f)] public float breathVolume = 1f;     // Volume voor ademen
     [Range(0f, 1f)] public float whisperVolume = 1f;    // Volume voor fluisteren
     [Range(0f, 1f)] public float jumpScareVolume = 1f;  // Volume voor schrikmoment
@@ -31,7 +31,7 @@ public class HybridPriestAI : MonoBehaviour
     private Vector3 jumpScareTarget;
     [Header("Respawn After JumpScare")]
 
-    private float jumpScareRespawnTimer = -1f;
+    //private float jumpScareRespawnTimer = -1f;
 
 
 
@@ -227,7 +227,7 @@ public class HybridPriestAI : MonoBehaviour
 
 
         ApplyFloating();
-        
+
     }
 
 
@@ -441,7 +441,7 @@ public class HybridPriestAI : MonoBehaviour
         isJumpScaring = true;
         hasAttacked = true;
         currentState = State.JumpScare;
-        
+
 
         Vector3 camPos = playerCamera.position;
         Vector3 priestPos = transform.position;
@@ -480,7 +480,7 @@ public class HybridPriestAI : MonoBehaviour
         hauntDelayTimer = 0f;
 
         // --- NIEUW: Gebruik de nieuwe slimme functie ---
-        PlaySpawnSoundNearPlayer(); 
+        PlaySpawnSoundNearPlayer();
         // ----------------------------------------------
 
         if (startInFlee)
@@ -521,9 +521,9 @@ public class HybridPriestAI : MonoBehaviour
 
         // Debug 2: Berekening
         Vector3 directionToPriest = (transform.position - player.position).normalized;
-        
+
         // We voegen Vector3.up toe zodat het geluid niet IN de grond spawnt
-        Vector3 fakeSoundPos = player.position + (directionToPriest * 2f) + Vector3.up; 
+        Vector3 fakeSoundPos = player.position + (directionToPriest * 2f) + Vector3.up;
 
         Debug.Log("Geluid wordt afgespeeld op positie: " + fakeSoundPos);
 
