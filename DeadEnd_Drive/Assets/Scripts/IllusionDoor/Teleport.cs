@@ -8,5 +8,8 @@ public class teleport : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
         player.transform.position = teleportPoint.transform.position;
+        Vector3 euler = player.transform.rotation.eulerAngles;
+        euler.y = teleportPoint.transform.rotation.eulerAngles.y;
+        player.transform.rotation = Quaternion.Euler(euler);
     }
 }

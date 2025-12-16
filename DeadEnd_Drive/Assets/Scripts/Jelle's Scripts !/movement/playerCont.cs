@@ -4,22 +4,22 @@ using UnityEngine;
 public class PlayerCont : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveForce = 50f;
     public float maxSpeed = 5f;
     public float sprintMultiplier = 1.5f;
 
     [Header("Jump")]
     public float jumpForce = 5f;
-    public bool isGrounded = false;
+    public bool isGrounded;
 
     [Header("Ladder/Stairs")]
-    public bool onLadderStairs = false;
+    public bool onLadderStairs;
     public float climbSpeed = 3f;
 
-    [Header("footstep audio")]
+    [Header("Footstep Audio")]
     public AudioSource footstepSource;
     public AudioClip walkClip;
     public AudioClip runClip;
+
     private Rigidbody rb;
 
     void Start()
@@ -46,22 +46,18 @@ public class PlayerCont : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        // direction relative to player
-        Vector3 moveDir = transform.TransformDirection(new Vector3(h, 0, v)).normalized;
+        Vector3 moveDir = transform.TransformDirection(new Vector3(h, 0f, v)).normalized;
+        float multiplier = Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f;
 
-        float currentMultiplier = Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f;
-
+        // -------- LADDER --------
         if (onLadderStairs)
         {
             rb.useGravity = false;
 
-            // vertical movement based on input
-            float verticalInput = Input.GetAxis("Vertical"); // W/S or Up/Down
-
             Vector3 climbVelocity = new Vector3(
-                moveDir.x * maxSpeed,        // horizontal X
-                verticalInput * climbSpeed,  // vertical Y
-                moveDir.z * maxSpeed         // horizontal Z
+                moveDir.x * maxSpeed,
+                v * climbSpeed,
+                moveDir.z * maxSpeed
             );
 
             rb.linearVelocity = climbVelocity;
@@ -72,22 +68,35 @@ public class PlayerCont : MonoBehaviour
             rb.useGravity = true;
         }
 
+        // -------- FIX: STOP PORTAL FLYING --------
+        if (isGrounded)
+        {
+            rb.linearVelocity = new Vector3(
+                rb.linearVelocity.x,
+                Mathf.Min(rb.linearVelocity.y, 0f),
+                rb.linearVelocity.z
+            );
+        }
+
+        // -------- HORIZONTAL MOVEMENT --------
         if (Mathf.Approximately(h, 0f) && Mathf.Approximately(v, 0f))
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            rb.linearVelocity = Vector3.Lerp(
+                rb.linearVelocity,
+                new Vector3(0f, rb.linearVelocity.y, 0f),
+                0.2f
+            );
         }
         else
         {
-            // Velocity-based movement
-            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            Vector3 targetVelocity = moveDir * maxSpeed * currentMultiplier;
+            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            Vector3 targetVelocity = moveDir * maxSpeed * multiplier;
             Vector3 velocityChange = targetVelocity - horizontalVelocity;
 
             rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, rb.linearVelocity.z);
         }
 
-        HandleFootsteps(moveDir.magnitude * maxSpeed * currentMultiplier, currentMultiplier);
+        HandleFootsteps(moveDir.magnitude * maxSpeed * multiplier, multiplier);
     }
 
     void HandleJump()
@@ -123,8 +132,7 @@ public class PlayerCont : MonoBehaviour
             return;
         }
 
-        bool isRunning = multiplier > 1f;
-        AudioClip clip = isRunning ? runClip : walkClip;
+        AudioClip clip = multiplier > 1f ? runClip : walkClip;
 
         if (footstepSource.clip != clip)
         {
@@ -133,15 +141,14 @@ public class PlayerCont : MonoBehaviour
         }
 
         footstepSource.pitch = Random.Range(0.95f, 1.05f);
-        if (!footstepSource.isPlaying)
-            footstepSource.Play();
     }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Ladder"))
         {
             onLadderStairs = true;
-            rb.linearVelocity = Vector3.zero; // stop any existing momentum
+            rb.linearVelocity = Vector3.zero;
         }
     }
 
@@ -152,5 +159,4 @@ public class PlayerCont : MonoBehaviour
             onLadderStairs = false;
         }
     }
-
 }
