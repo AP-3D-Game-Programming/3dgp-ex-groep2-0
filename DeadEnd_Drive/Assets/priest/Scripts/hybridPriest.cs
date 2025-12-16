@@ -15,6 +15,12 @@ public class HybridPriestAI : MonoBehaviour
     public float fallThresholdY = 1000f; // If priest falls below this, we respawn
 
 
+[Header("Audio Volumes")]
+    [Range(0f, 1f)] public float breathVolume = 1f;     // Volume voor ademen
+    [Range(0f, 1f)] public float whisperVolume = 1f;    // Volume voor fluisteren
+    [Range(0f, 1f)] public float jumpScareVolume = 1f;  // Volume voor schrikmoment
+    [Range(0f, 1f)] public float spawnVolume = 1f;
+
     [Header("Jump Scare")]
     public bool enableJumpScare = false;
     public AudioClip jumpScareClip;
@@ -40,6 +46,8 @@ public class HybridPriestAI : MonoBehaviour
     public AudioClip hauntBreathingLoop;      // breathing loop sound
     public AudioClip whisperLine1;            // "You shouldn't have come here..."
     public AudioClip whisperLine2;            // "We have been waiting..."
+    // --- NIEUW: Spawn geluid ---
+    public AudioClip spawnSound;              // Geluid bij spawnen
 
     public float whisperMinDelay = 4f;
     public float whisperMaxDelay = 10f;
@@ -117,6 +125,8 @@ public class HybridPriestAI : MonoBehaviour
         floatPhase = Random.Range(0f, 10f);
 
         whisperTimer = Random.Range(whisperMinDelay, whisperMaxDelay);
+
+        PlaySpawnSoundNearPlayer();
     }
 
     void Update()
@@ -469,6 +479,10 @@ public class HybridPriestAI : MonoBehaviour
         isJumpScaring = false;
         hauntDelayTimer = 0f;
 
+        // --- NIEUW: Gebruik de nieuwe slimme functie ---
+        PlaySpawnSoundNearPlayer(); 
+        // ----------------------------------------------
+
         if (startInFlee)
         {
             currentState = State.Flee;
@@ -488,6 +502,33 @@ public class HybridPriestAI : MonoBehaviour
             currentState = State.Orbit;
             Debug.Log("Priest respawned into Orbit state.");
         }
+    }
+
+    void PlaySpawnSoundNearPlayer()
+    {
+        // Debug 1: Check of de variabelen gevuld zijn
+        if (spawnSound == null)
+        {
+            Debug.LogError("FOUT: Er zit geen geluid in het vakje 'Spawn Sound' op de Priest!");
+            return;
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("FOUT: Je bent vergeten de 'Player' in het script te slepen!");
+            return;
+        }
+
+        // Debug 2: Berekening
+        Vector3 directionToPriest = (transform.position - player.position).normalized;
+        
+        // We voegen Vector3.up toe zodat het geluid niet IN de grond spawnt
+        Vector3 fakeSoundPos = player.position + (directionToPriest * 2f) + Vector3.up; 
+
+        Debug.Log("Geluid wordt afgespeeld op positie: " + fakeSoundPos);
+
+        // Debug 3: Afspelen
+        AudioSource.PlayClipAtPoint(spawnSound, playerCamera.position, 1f);
     }
 
 
