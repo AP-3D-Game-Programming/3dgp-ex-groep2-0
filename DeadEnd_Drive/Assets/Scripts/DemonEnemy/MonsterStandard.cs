@@ -7,15 +7,18 @@ public class MonsterStandard : MonoBehaviour
     public float lookRadius = 15f;
     public LayerMask obstacleMask;
     public Transform player;
-    // Update de route niet elke frame, maar elke 0.2 seconden (voorkomt haperen)
     private float pathUpdateDelay = 0.2f; 
     private float pathUpdateTimer;
 
     public float modelRotationCorrection = 0f;
 
-    [Header("Instellingen Dwalen")]
-    public float wanderRadius = 40f;
+    [Header("Instellingen Dwalen (Zone)")]
+    public float wanderRadius = 20f; // Iets kleiner gezet voor bij het huis
     public float wanderInterval = 10f;
+    
+    // NIEUW: Dit is het punt waar hij omheen moet blijven cirkelen
+    public Transform wanderZoneCenter; 
+    private Vector3 startPosition; // Fallback voor als je geen center instelt
 
     private NavMeshAgent agent;
     private float wanderTimer;
@@ -27,15 +30,21 @@ public class MonsterStandard : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         wanderTimer = wanderInterval;
         
-        // We regelen de rotatie zelf, dus Unity mag het niet doen
         agent.updateRotation = false; 
         agent.updateUpAxis = false;
+
+        // Sla de startpositie op. Als je 'wanderZoneCenter' vergeet in te vullen,
+        // blijft hij rondom zijn spawn-plek lopen.
+        startPosition = transform.position;
 
         if (player == null) Debug.LogError("VERGEET NIET DE SPELER TE KOPPELEN!");
     }
 
     void Update()
     {
+        // Veiligheidscheck: als player niet bestaat, stop de functie
+        if (player == null) return; 
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool canSeePlayer = CheckLineOfSight(distanceToPlayer);
 
@@ -56,30 +65,27 @@ public class MonsterStandard : MonoBehaviour
             WanderBehavior();
         }
 
-        // ALTIJD: Rotatie fixen
         FixModelRotation();
     }
 
     void ChaseBehavior(bool currentlySeeingPlayer)
     {
-        // Optimalisatie: Roep SetDestination niet elke frame aan (voorkomt stotteren)
         pathUpdateTimer += Time.deltaTime;
         if (pathUpdateTimer >= pathUpdateDelay)
         {
             agent.SetDestination(lastKnownPlayerPosition);
             pathUpdateTimer = 0;
-            agent.speed = 5;
+            // Als hij jaagt, mag hij wat sneller (optioneel)
+            agent.speed = 3.5f; 
         }
 
-        // Check of we er zijn EN de speler kwijt zijn
-        // !agent.pathPending is belangrijk: check niet als hij nog aan het rekenen is
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             if (!currentlySeeingPlayer)
             {
-                // We zijn op de laatste plek, speler is weg. Ga weer dwalen.
                 isChasing = false;
-                wanderTimer = wanderInterval; // Zorgt dat hij direct een nieuwe dwaal-plek zoekt
+                wanderTimer = wanderInterval; 
+                agent.speed = 2.0f; // Rustig lopen tijdens dwalen
             }
         }
     }
@@ -90,17 +96,15 @@ public class MonsterStandard : MonoBehaviour
 
         if (wanderTimer >= wanderInterval)
         {
+            // AANGEPAST: We gebruiken nu de vaste zone in plaats van huidige positie
             Vector3 newPos = RandomNavmeshLocation(wanderRadius);
             agent.SetDestination(newPos);
             wanderTimer = 0;
         }
     }
 
-    // --- VERBETERDE ROTATIE FUNCTIE ---
     void FixModelRotation()
     {
-        // We kijken naar de steeringTarget (het volgende punt op het pad)
-        // Dit is veel stabieler dan 'velocity'
         Vector3 direction = Vector3.zero;
 
         if (agent.hasPath)
@@ -109,18 +113,15 @@ public class MonsterStandard : MonoBehaviour
         }
         else if (agent.velocity.sqrMagnitude > 0.1f)
         {
-            // Fallback voor als er even geen pad is maar wel snelheid
             direction = agent.velocity.normalized;
         }
 
-        // Alleen draaien als er een duidelijke richting is (voorkomt trillen op 1 plek)
         if (direction != Vector3.zero && direction.magnitude > 0.1f)
         {
-            direction.y = 0; // Zorg dat hij niet omhoog/omlaag kijkt
+            direction.y = 0; 
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             Quaternion correction = Quaternion.Euler(0, modelRotationCorrection, 0);
             
-            // Iets snellere rotatie (8f) voor responsiviteit
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation * correction, Time.deltaTime * 8f);
         }
     }
@@ -132,13 +133,32 @@ public class MonsterStandard : MonoBehaviour
         return true;
     }
 
+    // AANGEPAST: Berekent locatie vanuit het centrum, niet vanuit de zombie
     public Vector3 RandomNavmeshLocation(float radius)
     {
+        // Bepaal het middelpunt: Is er een zoneCenter ingesteld? Gebruik die.
+        // Zo niet? Gebruik de positie waar de zombie het spel begon.
+        Vector3 origin = (wanderZoneCenter != null) ? wanderZoneCenter.position : startPosition;
+
         Vector3 randomDirection = Random.insideUnitSphere * radius;
-        randomDirection += transform.position;
+        
+        // Belangrijk: Tel het op bij de ORIGIN, niet bij transform.position
+        randomDirection += origin; 
+        
         NavMeshHit hit;
-        // Gebruik 1 als mask zodat hij overal mag lopen
         NavMesh.SamplePosition(randomDirection, out hit, radius, -1);
         return hit.position;
+    }
+    
+    // GIZMOS: Handig om in de editor te zien waar zijn gebied is
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        // Teken de dwaal-cirkel
+        Vector3 center = (wanderZoneCenter != null) ? wanderZoneCenter.position : (Application.isPlaying ? startPosition : transform.position);
+        Gizmos.DrawWireSphere(center, wanderRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, lookRadius);
     }
 }
