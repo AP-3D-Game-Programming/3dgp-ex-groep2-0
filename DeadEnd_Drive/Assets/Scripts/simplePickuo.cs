@@ -1,38 +1,42 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Collections;
 
 public class Pickup : MonoBehaviour
 {
+    [Header("Instellingen")]
     public float pickupRange = 3f;
     public KeyCode pickupKey = KeyCode.E;
 
+    [Header("Referenties")]
     public TMP_Text pickupText;
-    public Image jumpscareImage;
-    public DoorController doorController;
+    public GameObject teleporter;
+    
+    // De engerd die direct verschijnt
+    public GameObject shadowMan; 
+    
+    // NIEUW: De onzichtbare trigger die we AANZETTEN na oppakken
+    public GameObject doorTriggerObject; 
 
     public Transform player;
     private bool pickedUp = false;
-    private Rigidbody rb;
-
-    public AudioClip clip;
-    public GameObject teleporter;
-
-    // Voeg deze toe om het object onzichtbaar te maken
+    
     private MeshRenderer meshRenderer;
     private Collider objCollider;
+    private Rigidbody rb;
 
     void Start()
     {
-        teleporter.gameObject.SetActive(false);
         rb = GetComponent<Rigidbody>();
-        
-        // We pakken de renderer en collider om ze straks uit te zetten
         meshRenderer = GetComponent<MeshRenderer>();
         objCollider = GetComponent<Collider>();
+        
+        if (teleporter) teleporter.SetActive(false);
+        if (shadowMan) shadowMan.SetActive(false);
+        
+        // Zorg dat de deur-trigger ook UIT staat in het begin
+        if (doorTriggerObject) doorTriggerObject.SetActive(false);
 
-        // Jouw veilige player check
         if (player == null) 
         {
             var foundPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -40,32 +44,22 @@ public class Pickup : MonoBehaviour
         }
 
         if (pickupText) pickupText.gameObject.SetActive(false);
-        if (jumpscareImage) jumpscareImage.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        // Als we hem al hebben opgepakt, doen we NIETS meer in Update.
-        // De Coroutine handelt de rest af.
-        if (pickedUp) return; 
+        if (pickedUp || player == null) return; 
 
-        if (player != null) // Extra check om crash te voorkomen
+        float dist = Vector3.Distance(player.position, transform.position);
+
+        if (dist <= pickupRange)
         {
-            float dist = Vector3.Distance(player.position, transform.position);
-
-            if (dist <= pickupRange)
-            {
-                if (pickupText) pickupText.gameObject.SetActive(true);
-
-                if (Input.GetKeyDown(pickupKey))
-                {
-                    HandlePickup(); // We maken een aparte functie voor netheid
-                }
-            }
-            else
-            {
-                if (pickupText) pickupText.gameObject.SetActive(false);
-            }
+            if (pickupText) pickupText.gameObject.SetActive(true);
+            if (Input.GetKeyDown(pickupKey)) HandlePickup();
+        }
+        else
+        {
+            if (pickupText) pickupText.gameObject.SetActive(false);
         }
     }
 
@@ -73,43 +67,30 @@ public class Pickup : MonoBehaviour
     {
         pickedUp = true;
 
-        // 1. Tekst weg
         if (pickupText) pickupText.gameObject.SetActive(false);
-
-        // 2. Teleporter aan
         if (teleporter) teleporter.gameObject.SetActive(true);
 
-        // 3. Deur dicht
-        if (doorController) doorController.SlamShut(1.5f);
-
-        // 4. BELANGRIJK: Maak object onzichtbaar, maar zet het NIET uit!
-        if (meshRenderer) meshRenderer.enabled = false; // Plaatje weg
-        if (objCollider) objCollider.enabled = false;   // Botsing weg
-        if (rb) rb.isKinematic = true; // Zorg dat hij niet meer valt
-
-        // 5. Start de jumpscare correct
-        StartCoroutine(ShowJumpscare());
-    }
-
-    IEnumerator ShowJumpscare()
-    {
-        // Geluid afspelen
-        AudioSource src = GetComponent<AudioSource>();
-        if (src != null && clip != null)
+        // 1. Laat het monster DIRECT zien
+        if (shadowMan != null) 
         {
-            src.PlayOneShot(clip);
+            shadowMan.SetActive(true);
+            shadowMan.transform.LookAt(player); 
+            Vector3 e = shadowMan.transform.rotation.eulerAngles;
+            shadowMan.transform.rotation = Quaternion.Euler(0, e.y, 0);
         }
 
-        // Plaatje tonen
-        if (jumpscareImage) jumpscareImage.gameObject.SetActive(true);
+        // 2. Activeer de onzichtbare valstrik bij de deur
+        if (doorTriggerObject != null)
+        {
+            doorTriggerObject.SetActive(true);
+        }
 
-        // Wacht 1 seconde (terwijl het script nog leeft!)
-        yield return new WaitForSeconds(1f);
-
-        // Plaatje weer weg
-        if (jumpscareImage) jumpscareImage.gameObject.SetActive(false);
-
-        // NU pas vernietigen we het object definitief
-        Destroy(gameObject); 
+        // Maak item onzichtbaar
+        if (meshRenderer) meshRenderer.enabled = false;
+        if (objCollider) objCollider.enabled = false;
+        if (rb) rb.isKinematic = true;
+        
+        // Vernietig dit object pas na een tijdje (zodat teleporter aan blijft)
+        Destroy(gameObject, 5f);
     }
 }
