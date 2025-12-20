@@ -1,26 +1,34 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(AudioSource))]
 public class MonsterStandard : MonoBehaviour
 {
+    [Header("Cameras (Sleep ze hierin!)")]
+    public GameObject mainCamera;  // Je normale speler camera
+    public GameObject scareCamera; // De camera op het hoofd van het monster
+
     [Header("Instellingen Jagen")]
     public float lookRadius = 15f;
     public LayerMask obstacleMask;
     public Transform player;
     private float pathUpdateDelay = 0.2f; 
     private float pathUpdateTimer;
-
     public float modelRotationCorrection = 0f;
 
-    [Header("Instellingen Dwalen (Zone)")]
-    public float wanderRadius = 20f; // Iets kleiner gezet voor bij het huis
+    [Header("Instellingen Dwalen")]
+    public float wanderRadius = 20f;
     public float wanderInterval = 10f;
-    
-    // NIEUW: Dit is het punt waar hij omheen moet blijven cirkelen
     public Transform wanderZoneCenter; 
-    private Vector3 startPosition; // Fallback voor als je geen center instelt
+    private Vector3 startPosition;
 
+    [Header("Instellingen Aanval")]
+    public float attackDistance = 1.5f;
+    public AudioClip attackSound;
+    
+    private bool hasAttacked = false;
     private NavMeshAgent agent;
+    private AudioSource audioSource;
     private float wanderTimer;
     private Vector3 lastKnownPlayerPosition;
     private bool isChasing = false;
@@ -28,137 +36,89 @@ public class MonsterStandard : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        audioSource = GetComponent<AudioSource>();
         wanderTimer = wanderInterval;
         
         agent.updateRotation = false; 
         agent.updateUpAxis = false;
+        agent.stoppingDistance = attackDistance - 0.2f; 
 
-        // Sla de startpositie op. Als je 'wanderZoneCenter' vergeet in te vullen,
-        // blijft hij rondom zijn spawn-plek lopen.
         startPosition = transform.position;
 
-        if (player == null) Debug.LogError("VERGEET NIET DE SPELER TE KOPPELEN!");
+        // Veiligheidscheck
+        if (scareCamera != null) scareCamera.SetActive(false); // Zeker weten dat hij uit begint
+        if (mainCamera == null) Debug.LogWarning("Vergeet je Main Camera niet te koppelen!");
     }
 
     void Update()
     {
-        // Veiligheidscheck: als player niet bestaat, stop de functie
-        if (player == null) return; 
+        if (player == null || hasAttacked) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool canSeePlayer = CheckLineOfSight(distanceToPlayer);
 
-        // STATUS BEPALEN
-        if (canSeePlayer)
+        if (distanceToPlayer <= attackDistance)
         {
-            isChasing = true;
-            lastKnownPlayerPosition = player.position;
-        }
-
-        // GEDRAG UITVOEREN
-        if (isChasing)
-        {
-            ChaseBehavior(canSeePlayer);
+            AttackPlayer();
         }
         else
         {
-            WanderBehavior();
-        }
-
-        FixModelRotation();
-    }
-
-    void ChaseBehavior(bool currentlySeeingPlayer)
-    {
-        pathUpdateTimer += Time.deltaTime;
-        if (pathUpdateTimer >= pathUpdateDelay)
-        {
-            agent.SetDestination(lastKnownPlayerPosition);
-            pathUpdateTimer = 0;
-            // Als hij jaagt, mag hij wat sneller (optioneel)
-            agent.speed = 3.5f; 
-        }
-
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
-        {
-            if (!currentlySeeingPlayer)
+            if (canSeePlayer)
             {
-                isChasing = false;
-                wanderTimer = wanderInterval; 
-                agent.speed = 2.0f; // Rustig lopen tijdens dwalen
+                isChasing = true;
+                lastKnownPlayerPosition = player.position;
             }
+
+            if (isChasing) ChaseBehavior(canSeePlayer);
+            else WanderBehavior();
+
+            FixModelRotation();
         }
     }
 
-    void WanderBehavior()
+    void AttackPlayer()
     {
+        hasAttacked = true;
+        isChasing = false;
+
+        // 1. Stop het monster
+        agent.isStopped = true;
+        agent.ResetPath();
+
+        // 2. CAMERA SWAP TRUC
+        if (mainCamera != null) mainCamera.SetActive(false); // Zet speler ogen uit
+        if (scareCamera != null) scareCamera.SetActive(true); // Zet monster camera aan
+
+        // 3. Geluid afspelen
+        if (attackSound != null) audioSource.PlayOneShot(attackSound);
+        
+        Debug.Log("JUMPSCARE! Camera switch!");
+    }
+
+    // --- De standaard functies (ongewijzigd) ---
+    void ChaseBehavior(bool currentlySeeingPlayer) {
+        pathUpdateTimer += Time.deltaTime;
+        if (pathUpdateTimer >= pathUpdateDelay) { agent.SetDestination(lastKnownPlayerPosition); pathUpdateTimer = 0; agent.speed = 3.5f; }
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance && !currentlySeeingPlayer) { isChasing = false; wanderTimer = wanderInterval; agent.speed = 2.0f; }
+    }
+    void WanderBehavior() {
         wanderTimer += Time.deltaTime;
-
-        if (wanderTimer >= wanderInterval)
-        {
-            // AANGEPAST: We gebruiken nu de vaste zone in plaats van huidige positie
-            Vector3 newPos = RandomNavmeshLocation(wanderRadius);
-            agent.SetDestination(newPos);
-            wanderTimer = 0;
-        }
+        if (wanderTimer >= wanderInterval) { agent.SetDestination(RandomNavmeshLocation(wanderRadius)); wanderTimer = 0; }
     }
-
-    void FixModelRotation()
-    {
-        Vector3 direction = Vector3.zero;
-
-        if (agent.hasPath)
-        {
-            direction = (agent.steeringTarget - transform.position).normalized;
-        }
-        else if (agent.velocity.sqrMagnitude > 0.1f)
-        {
-            direction = agent.velocity.normalized;
-        }
-
-        if (direction != Vector3.zero && direction.magnitude > 0.1f)
-        {
-            direction.y = 0; 
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            Quaternion correction = Quaternion.Euler(0, modelRotationCorrection, 0);
-            
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation * correction, Time.deltaTime * 8f);
-        }
+    void FixModelRotation() {
+        Vector3 dir = Vector3.zero;
+        if (agent.hasPath) dir = (agent.steeringTarget - transform.position).normalized;
+        else if (agent.velocity.sqrMagnitude > 0.1f) dir = agent.velocity.normalized;
+        if (dir != Vector3.zero) { dir.y = 0; transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir) * Quaternion.Euler(0, modelRotationCorrection, 0), Time.deltaTime * 8f); }
     }
-
-    bool CheckLineOfSight(float distance)
-    {
-        if (distance > lookRadius) return false;
-        if (Physics.Linecast(transform.position, player.position, obstacleMask)) return false;
-        return true;
+    bool CheckLineOfSight(float d) {
+        if (d > lookRadius) return false;
+        return !Physics.Linecast(transform.position, player.position, obstacleMask);
     }
-
-    // AANGEPAST: Berekent locatie vanuit het centrum, niet vanuit de zombie
-    public Vector3 RandomNavmeshLocation(float radius)
-    {
-        // Bepaal het middelpunt: Is er een zoneCenter ingesteld? Gebruik die.
-        // Zo niet? Gebruik de positie waar de zombie het spel begon.
-        Vector3 origin = (wanderZoneCenter != null) ? wanderZoneCenter.position : startPosition;
-
-        Vector3 randomDirection = Random.insideUnitSphere * radius;
-        
-        // Belangrijk: Tel het op bij de ORIGIN, niet bij transform.position
-        randomDirection += origin; 
-        
-        NavMeshHit hit;
-        NavMesh.SamplePosition(randomDirection, out hit, radius, -1);
-        return hit.position;
+    public Vector3 RandomNavmeshLocation(float r) {
+        Vector3 o = (wanderZoneCenter != null) ? wanderZoneCenter.position : startPosition;
+        Vector3 rd = Random.insideUnitSphere * r + o; 
+        NavMeshHit h; NavMesh.SamplePosition(rd, out h, r, -1); return h.position;
     }
-    
-    // GIZMOS: Handig om in de editor te zien waar zijn gebied is
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        // Teken de dwaal-cirkel
-        Vector3 center = (wanderZoneCenter != null) ? wanderZoneCenter.position : (Application.isPlaying ? startPosition : transform.position);
-        Gizmos.DrawWireSphere(center, wanderRadius);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, lookRadius);
-    }
+    void OnDrawGizmosSelected() { Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, lookRadius); Gizmos.DrawSphere(transform.position, attackDistance); }
 }
