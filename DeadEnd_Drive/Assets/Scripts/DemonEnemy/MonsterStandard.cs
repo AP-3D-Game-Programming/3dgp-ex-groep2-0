@@ -1,12 +1,26 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.UI;
+using System.Collections;
 
 [RequireComponent(typeof(AudioSource))]
 public class MonsterStandard : MonoBehaviour
 {
-    [Header("Cameras (Sleep ze hierin!)")]
-    public GameObject mainCamera;  // Je normale speler camera
-    public GameObject scareCamera; // De camera op het hoofd van het monster
+    [Header("Cameras")]
+    public GameObject mainCamera;
+    public GameObject scareCamera;
+
+    [Header("Game Over UI")]
+    public GameObject gameOverScreen;
+    public TMP_Text youDiedText;
+    public Button respawnButton;
+
+    [Header("Timing Instellingen")]
+    public float timeToStareAtMonster = 2.0f; // Hoe lang kijk je naar het monster?
+    public float textFadeInDuration = 4.0f;   // Hoe langzaam verschijnt de tekst? (Langer = dramatischer)
+    public float waitBeforeButton = 2.0f;     // Wachttijd nadat tekst er is
 
     [Header("Instellingen Jagen")]
     public float lookRadius = 15f;
@@ -45,9 +59,13 @@ public class MonsterStandard : MonoBehaviour
 
         startPosition = transform.position;
 
-        // Veiligheidscheck
-        if (scareCamera != null) scareCamera.SetActive(false); // Zeker weten dat hij uit begint
-        if (mainCamera == null) Debug.LogWarning("Vergeet je Main Camera niet te koppelen!");
+        if (scareCamera != null) scareCamera.SetActive(false);
+        if (gameOverScreen != null) gameOverScreen.SetActive(false);
+        if (respawnButton != null) 
+        {
+            respawnButton.gameObject.SetActive(false);
+            respawnButton.onClick.AddListener(RestartScene);
+        }
     }
 
     void Update()
@@ -81,21 +99,52 @@ public class MonsterStandard : MonoBehaviour
         hasAttacked = true;
         isChasing = false;
 
-        // 1. Stop het monster
+        // 1. Stop Monster
         agent.isStopped = true;
         agent.ResetPath();
 
-        // 2. CAMERA SWAP TRUC
-        if (mainCamera != null) mainCamera.SetActive(false); // Zet speler ogen uit
-        if (scareCamera != null) scareCamera.SetActive(true); // Zet monster camera aan
+        // 2. Camera Wissel (Zorg dat ScareCamera een AudioListener heeft!)
+        if (mainCamera != null) mainCamera.SetActive(false);
+        if (scareCamera != null) scareCamera.SetActive(true);
 
         // 3. Geluid afspelen
+        // We gebruiken PlayOneShot zodat het geluid helemaal afspeelt
         if (attackSound != null) audioSource.PlayOneShot(attackSound);
         
-        Debug.Log("JUMPSCARE! Camera switch!");
+        StartCoroutine(GameOverSequence());
     }
 
-    // --- De standaard functies (ongewijzigd) ---
+    IEnumerator GameOverSequence()
+    {
+        // Stap 1: We staren naar het monster terwijl het geluid speelt
+        yield return new WaitForSeconds(timeToStareAtMonster);
+
+        // Stap 2: Scherm wordt zwart (of rood, wat je paneel ook is)
+        if (gameOverScreen != null) gameOverScreen.SetActive(true);
+
+        // Stap 3: Tekst begint langzaam te verschijnen
+        if (youDiedText != null)
+        {
+            youDiedText.canvasRenderer.SetAlpha(0f); // Begin onzichtbaar
+            youDiedText.CrossFadeAlpha(1f, textFadeInDuration, false); // Fade langzaam in
+        }
+
+        // Wacht terwijl de tekst infade
+        yield return new WaitForSeconds(textFadeInDuration + waitBeforeButton);
+
+        // Stap 4: Muis en Knop
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (respawnButton != null) respawnButton.gameObject.SetActive(true);
+    }
+
+    void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // --- Standaard Functies ---
     void ChaseBehavior(bool currentlySeeingPlayer) {
         pathUpdateTimer += Time.deltaTime;
         if (pathUpdateTimer >= pathUpdateDelay) { agent.SetDestination(lastKnownPlayerPosition); pathUpdateTimer = 0; agent.speed = 3.5f; }
