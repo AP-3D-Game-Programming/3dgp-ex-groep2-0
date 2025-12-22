@@ -8,6 +8,7 @@ using UnityEngine.Playables;
 public class CarEntry : MonoBehaviour
 {
     [Header("Settings")]
+    public bool isLocked = true;
     public bool startInsideCar = false;
     public bool isOutOfFuel = false;
 
@@ -52,8 +53,8 @@ public class CarEntry : MonoBehaviour
 
         if (startInsideCar)
         {
+            isLocked = false;
             EnterVehicle();
-
             StartCoroutine(StartEngineRoutine());
         }
     }
@@ -79,12 +80,20 @@ public class CarEntry : MonoBehaviour
         {
             if (carEntry != null)
             {
-                carEntry.text = "Press F to Enter";
-                carEntry.gameObject.SetActive(true);
+                if (isLocked)
+                {
+                    carEntry.text = "Locked, there must be a key nearby";
+                }
+                else
+                {
+                    carEntry.text = "Press F to Enter";
+
+                    carEntry.gameObject.SetActive(true);
+                }
             }
 
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (!isLocked && Input.GetKeyDown(KeyCode.F))
             {
                 carEntry.gameObject.SetActive(false);
                 EnterVehicle();
@@ -119,6 +128,11 @@ public class CarEntry : MonoBehaviour
         }
     }
 
+    public void UnlockCar()
+    {
+        isLocked = false;
+    }
+
 
     private void HandlePlayerExit()
     {
@@ -142,31 +156,19 @@ public class CarEntry : MonoBehaviour
 
     public void EnterVehicle()
     {
-        if (player == null || driverSeat == null || vehicle == null)
-        {
-            Debug.LogError("CarEntry references not assigned!");
-            return;
-        }
-
+        if (carEntry != null) carEntry.gameObject.SetActive(false);
         isInVehicle = true;
-
         if (playerController != null) playerController.enabled = false;
-
         if (playerRb != null)
         {
             playerRb.linearVelocity = Vector3.zero;
             playerRb.isKinematic = true;
             playerRb.detectCollisions = false;
         }
-
         player.SetParent(driverSeat);
         player.localPosition = Vector3.zero;
         player.localRotation = Quaternion.identity;
-
-        if (carTimeline != null)
-        {
-            carTimeline.Play();
-        }
+        if (carTimeline != null) carTimeline.Play();
     }
 
     private void ExitVehicle()
@@ -223,34 +225,4 @@ public class CarEntry : MonoBehaviour
             gasEmptyText.gameObject.SetActive(false);
         }
     }
-
-    private IEnumerator GradualStop(Rigidbody carRb)
-    {
-        Vector3 initialVelocity = carRb.linearVelocity;
-        float startSpeed = initialVelocity.magnitude;
-
-        float decelerationRate = 10f;
-
-        while (carRb.linearVelocity.magnitude > 0.1f)
-        {
-            // Reduce the current speed linearly
-            float newSpeed = Mathf.MoveTowards(carRb.linearVelocity.magnitude, 0f, decelerationRate * Time.deltaTime);
-
-            // Apply the new speed in the direction the car is currently moving
-            carRb.linearVelocity = carRb.linearVelocity.normalized * newSpeed;
-
-            yield return null;
-        }
-
-        carRb.linearVelocity = Vector3.zero;
-        carRb.angularVelocity = Vector3.zero;
-
-        // High drag to keep it parked
-        carRb.linearDamping = 100f;
-        carRb.angularDamping = 100f;
-
-        // Force sleep to ensure it doesn't slide down hills
-        carRb.Sleep();
-    }
 }
-

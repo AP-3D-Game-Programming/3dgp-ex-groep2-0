@@ -10,7 +10,11 @@ public class KeyStartCar : MonoBehaviour
 
     void Start()
     {
-        Prompt.gameObject.SetActive(false);
+        if (Prompt)
+        {
+            Prompt.gameObject.SetActive(false);
+        }
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -18,8 +22,11 @@ public class KeyStartCar : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInside = true;
-            Prompt.text = "Press 'E' to pick up car key";
-            Prompt.gameObject.SetActive(true);
+            if(Prompt)
+            {
+                Prompt.text = "Press 'E' to pick up car key";
+                Prompt.gameObject.SetActive(true);
+            }
         }
     }
 
@@ -36,9 +43,10 @@ public class KeyStartCar : MonoBehaviour
     {
         if (playerInside && Input.GetKeyDown(KeyCode.E))
         {
-            carEntry.enabled = true;
-            Prompt.gameObject.SetActive(false);
-            Destroy(gameObject);   // destroy key
+            if(carEntry) carEntry.UnlockCar();
+            
+            if(Prompt) Prompt.gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 }
