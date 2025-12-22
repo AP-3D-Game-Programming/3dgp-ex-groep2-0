@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEngine.Playables;
 
 public class CarEntry : MonoBehaviour
 {
@@ -20,14 +21,16 @@ public class CarEntry : MonoBehaviour
     public Transform carDoor;
     public FPVCam CameraController;
     public Transform driverSeat;
+    public PlayableDirector carTimeline;
 
     [Header("UI")]
     public TextMeshProUGUI carEntry;
     public TextMeshProUGUI gasEmptyText;
 
     private bool isInVehicle = false;
-    private bool isRideInProgress = false;
+    private bool hasRideFinished = false;
     private Rigidbody playerRb;
+    private PlayerCont playerController;
 
     [Header("Sound")]
     private AudioSource src;
@@ -37,8 +40,14 @@ public class CarEntry : MonoBehaviour
     void Start()
     {
         if (gasEmptyText != null) gasEmptyText.gameObject.SetActive(false);
-        carEntry.gameObject.SetActive(false);
-        playerRb = player.GetComponent<Rigidbody>();
+        if (carEntry != null) carEntry.gameObject.SetActive(false);
+
+        if (player != null)
+        {
+            playerRb = player.GetComponent<Rigidbody>();
+            playerController = player.GetComponent<PlayerCont>();
+        }
+
         src = gameObject.GetComponent<AudioSource>();
 
         if (startInsideCar)
@@ -51,31 +60,29 @@ public class CarEntry : MonoBehaviour
 
     void Update()
     {
-        if (!isInVehicle)
+        if (isInVehicle)
         {
-            HandlePlayerEntry();
+            HandlePlayerExit();
         }
         else
         {
-
-            if (isRideInProgress)
-            {
-                carEntry.gameObject.SetActive(false);
-                return;
-            }
-
-            carEntry.gameObject.SetActive(true);
-            HandlePlayerExit();
-
+            HandlePlayerEntry();
         }
     }
 
     private void HandlePlayerEntry()
     {
+        if (hasRideFinished) return;
+        if (player == null || carDoor == null) return;
+
         if (Vector3.Distance(player.position, carDoor.position) < 3f)
         {
-            carEntry.text = "Press F to Enter";
-            carEntry.gameObject.SetActive(true);
+            if (carEntry != null)
+            {
+                carEntry.text = "Press F to Enter";
+                carEntry.gameObject.SetActive(true);
+            }
+
 
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -86,41 +93,47 @@ public class CarEntry : MonoBehaviour
         }
         else
         {
-            carEntry.gameObject.SetActive(false);
+            if (carEntry != null)
+            {
+                carEntry.gameObject.SetActive(false);    
+            }
+            
         }
-    }
-
-    private IEnumerator RideSequence()
-    {
-        isRideInProgress = true;
-
-        yield return new WaitForSeconds(rideDuration);
-
-        isRideInProgress = false;
-
-        carEntry.text = "Press F to Exit";
     }
 
     private IEnumerator StartEngineRoutine()
     {
 
-        src.loop = false;
+        if (src == null || startEngine == null) yield break;
 
+        src.loop = false;
         src.PlayOneShot(startEngine);
 
         yield return new WaitForSeconds(startEngine.length);
 
-
-        src.clip = driveEngine;
-
-        src.loop = true;
-
-        src.Play();
+        if (driveEngine != null)
+        {
+            src.clip = driveEngine;
+            src.loop = true;
+            src.Play();
+        }
     }
 
 
     private void HandlePlayerExit()
     {
+        if (carTimeline != null && carTimeline.state == PlayState.Playing)
+        {
+            if (carEntry != null) carEntry.gameObject.SetActive(false);
+            return;
+        }
+
+        if (carEntry != null)
+        {
+            carEntry.text = "Press F to Exit";
+            carEntry.gameObject.SetActive(true);
+        }
+
         if (Input.GetKeyDown(KeyCode.F))
         {
             ExitVehicle();
@@ -129,75 +142,67 @@ public class CarEntry : MonoBehaviour
 
     public void EnterVehicle()
     {
-
         if (player == null || driverSeat == null || vehicle == null)
         {
             Debug.LogError("CarEntry references not assigned!");
             return;
         }
 
-        if (playerRb == null)
-            playerRb = player.GetComponent<Rigidbody>();
         isInVehicle = true;
 
-        StartCoroutine(RideSequence());
+        if (playerController != null) playerController.enabled = false;
 
-        player.GetComponent<PlayerCont>().enabled = false;
-        playerRb.detectCollisions = false;
+        if (playerRb != null)
+        {
+            playerRb.linearVelocity = Vector3.zero;
+            playerRb.isKinematic = true;
+            playerRb.detectCollisions = false;
+        }
 
         player.SetParent(driverSeat);
         player.localPosition = Vector3.zero;
         player.localRotation = Quaternion.identity;
 
-        playerRb.isKinematic = true;
-        playerRb.constraints = RigidbodyConstraints.FreezeAll;
-
-        Rigidbody carRb = vehicle.GetComponent<Rigidbody>();
-        if (carRb != null)
+        if (carTimeline != null)
         {
-            carRb.linearDamping = 0.1f;
-            carRb.angularDamping = 0.1f;
+            carTimeline.Play();
         }
-
-        // Enable vehicle controls
-        vehicle.GetComponent<CarController>().enabled = true;
     }
 
     private void ExitVehicle()
     {
-        src.Stop();
+        if (src != null) src.Stop();
+
         isInVehicle = false;
-
-        carEntry.text = "Press F to Enter";
-        carEntry.gameObject.SetActive(false);
-
-        if (player.GetComponent<PlayerCont>() != null)
+        hasRideFinished = true;
+        if (carEntry != null)
         {
-            player.GetComponent<PlayerCont>().enabled = true;
+            carEntry.text = "Press F to Enter";
+            carEntry.gameObject.SetActive(false);
         }
 
-        playerRb.detectCollisions = true;
-        // Unparent player
         player.SetParent(null);
 
-        // Unlock physics and movement
-        playerRb.isKinematic = false;
-        playerRb.constraints = RigidbodyConstraints.FreezeRotation;
-
-        // Disable the car controller script
-        if (vehicle.GetComponent<CarController>() != null)
+        if (carDoor != null)
         {
-            vehicle.GetComponent<CarController>().enabled = false;
+            player.position = carDoor.position;
+            player.rotation = carDoor.rotation;
+        }
+        else
+        {
+            player.position = vehicle.position + vehicle.transform.right * -2f;
         }
 
-        // Move player slightly outside the vehicle
-        player.position = vehicle.position + vehicle.transform.right * -2f;
-
-        // Apply realistic braking to the car
-        Rigidbody carRb = vehicle.GetComponent<Rigidbody>();
-        if (carRb != null)
+        if (playerRb != null)
         {
-            StartCoroutine(GradualStop(carRb));
+            playerRb.detectCollisions = true;
+            playerRb.isKinematic = false;
+            playerRb.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+
+        if (playerController != null)
+        {
+            playerController.enabled = true;
         }
 
         if (isOutOfFuel)
@@ -210,7 +215,7 @@ public class CarEntry : MonoBehaviour
     {
         if (gasEmptyText != null)
         {
-            gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house. (don't enter the car again, softlock)";
+            gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house.";
             gasEmptyText.gameObject.SetActive(true);
 
             yield return new WaitForSeconds(4f);

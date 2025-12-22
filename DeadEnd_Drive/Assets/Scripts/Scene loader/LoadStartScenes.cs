@@ -7,7 +7,7 @@ public class Startup : MonoBehaviour
     public CarEntry carEntryScript;
     void Start()
     {
-        carEntryScript.EnterVehicle();
+        // carEntryScript.EnterVehicle();
         LoadSecondSceneAdditive();
     }
     public void LoadSecondSceneAdditive()
