@@ -11,6 +11,7 @@ TagManager:
   - Teleport
   - StopCarTrigger
   - Enemy
+  - House
   layers:
   - Default
   - TransparentFX
