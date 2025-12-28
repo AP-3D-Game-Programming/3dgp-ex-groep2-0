@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SafeTrigger : MonoBehaviour
 {
-    public MonsterManager manager;
+    public PriestManager manager;
 
     private void OnTriggerEnter(Collider other)
     {

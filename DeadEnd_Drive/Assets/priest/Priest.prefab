@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3676489924315493191}
   - component: {fileID: 6741756541213613629}
-  - component: {fileID: 6507590965443189491}
+  - component: {fileID: 6479480335931196075}
   - component: {fileID: 624248866052933802}
   - component: {fileID: 599345271747657319}
   - component: {fileID: 6926793826539997971}
@@ -94,7 +94,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6507590965443189491
+--- !u!114 &6479480335931196075
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,60 +103,63 @@ MonoBehaviour:
   m_GameObject: {fileID: 386990450150883668}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95b73dc63a03dd748bc3017f9e5fd681, type: 3}
+  m_Script: {fileID: 11500000, guid: f75b4ac1714b75245b754265bed851ee, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HybridPriestAI
+  m_EditorClassIdentifier: Assembly-CSharp::HybridPriestAIV4
   currentState: 2
   player: {fileID: 0}
   playerCamera: {fileID: 0}
+  playerRespawn: {fileID: 0}
+  spawner: {fileID: 0}
+  autoAssignIfMissing: 1
+  playerTag: Player
   respawnPoint: {fileID: 0}
-  fallThresholdY: -10
-  breathVolume: 1
-  whisperVolume: 1
-  jumpScareVolume: 1
-  spawnVolume: 1
+  fallThresholdY: -1000
   enableJumpScare: 1
   jumpScareClip: {fileID: 8300000, guid: 67251fa7b1e182c499013640c36f2079, type: 3}
   isJumpScaring: 0
-  jumpScareSpeed: 20
-  jumpScareDistance: 1
-  jumpScareOffset: {x: 0, y: 0.3, z: 0}
-  jumpScareViewAngle: 20
-  spawner: {fileID: 0}
+  jumpScareViewAngle: 10
+  detectPoint: {fileID: 7704362582539135390}
+  jumpScareOffset: {x: 0, y: 0, z: 0}
+  attackMoveSpeed: 25
+  maxAttackTime: 0.7
+  stopDistance: 1.5
+  attackTurnSpeed: 18
+  lockY: 1
+  makeCollidersTriggerDuringAttack: 1
+  spookTime: 1.5
   breathSource: {fileID: 599345271747657319}
   whisperSource: {fileID: 6926793826539997971}
   hauntBreathingLoop: {fileID: 8300000, guid: 74aec4606952f4af1ba8d3c7d9581b43, type: 3}
-  whisperLine1: {fileID: 8300000, guid: 025377fac06d77f449779944a67bb0be, type: 3}
-  whisperLine2: {fileID: 0}
-  spawnSound: {fileID: 8300000, guid: 44000b977c18356498dcc38c9d56ce4f, type: 3}
-  whisperMinDelay: 10
-  whisperMaxDelay: 20
-  specialWhisperCooldown: 15
-  orbitRadius: 15
-  toHauntDistance: 10
-  toFleeDistance: 5
+  whisperLine1: {fileID: 8300000, guid: f839e71535d0e4231ab20acc4644eb48, type: 3}
+  whisperLine2: {fileID: 8300000, guid: fea1429f233f447bd8edbf992d82bd32, type: 3}
+  whisperMinDelay: 4
+  whisperMaxDelay: 10
+  specialWhisperCooldown: 6
+  orbitRadius: 25
+  toHauntDistance: 20
+  toFleeDistance: 3
   orbitSpeed: 25
-  hauntSpeed: 4
-  fleeSpeed: 30
-  lookDotThreshold: 0.4
-  hauntStopDistance: 10
-  overhang: 4
-  hauntDelay: 2
-  enableFleeBehavior: 0
+  hauntSpeed: 3
+  fleeSpeed: 10
+  lookDotThreshold: 0.8
+  hauntStopDistance: 7
+  overhang: 5
+  hauntDelay: 3
+  enableFleeBehavior: 1
   requirePlayerMoving: 0
   playerMoveThreshold: 0.15
-  fleeDistance: 150
+  fleeDistance: 60
   useFleeTimer: 1
-  fleeTime: 10
-  hoverHeight: 1.5
+  fleeTime: 5
+  hoverHeight: 2
   floatAmplitude: 0.4
   floatFrequency: 1.5
   raycastHeight: 10
   raycastDistance: 30
   groundLayers:
     serializedVersion: 2
-    m_Bits: 1
-  hasAttacked: 0
+    m_Bits: 4294967295
 --- !u!54 &624248866052933802
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -164,10 +167,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386990450150883668}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 70
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -197,9 +200,9 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: b64a054737fb942e0b9cf0aeb5f44e01, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.8
+  m_Volume: 0.7
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -292,7 +295,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 025377fac06d77f449779944a67bb0be, type: 3}
+  m_Resource: {fileID: 8300000, guid: 9709e735246ddd141ba45e1de0831e2d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -462,6 +465,8 @@ SkinnedMeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -483,6 +488,7 @@ SkinnedMeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -532,7 +538,8 @@ Transform:
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7704362582539135390}
   m_Father: {fileID: 3951302973757334888}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &1581846860886816136
@@ -555,6 +562,8 @@ SkinnedMeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -576,6 +585,7 @@ SkinnedMeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -715,6 +725,8 @@ SkinnedMeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -736,6 +748,7 @@ SkinnedMeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -1119,6 +1132,8 @@ SkinnedMeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1140,6 +1155,7 @@ SkinnedMeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -5945,6 +5961,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5966,6 +5984,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -6393,6 +6412,8 @@ SkinnedMeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6414,6 +6435,7 @@ SkinnedMeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -6773,6 +6795,37 @@ Transform:
   - {fileID: 6623943887956443103}
   m_Father: {fileID: 8430367865010125889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5343352151795008054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7704362582539135390}
+  m_Layer: 0
+  m_Name: LookPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7704362582539135390
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5343352151795008054}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
+  m_LocalPosition: {x: 0.006, y: -0.106, z: 2.077}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7047686981176929274}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!1 &5402928045242973694
 GameObject:
   m_ObjectHideFlags: 0
@@ -11838,6 +11891,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -11859,6 +11914,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0

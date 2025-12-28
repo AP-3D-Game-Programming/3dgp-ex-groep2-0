@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class HybridPriestAI : MonoBehaviour
+public class HybridPriestAI_V2 : MonoBehaviour
 {
     public enum State { Orbit, Haunt, Flee, JumpScare }
     public State currentState = State.Orbit;
@@ -11,100 +11,124 @@ public class HybridPriestAI : MonoBehaviour
     public Transform playerCamera;
 
     [Header("Fail-Safe")]
-    public Transform respawnPoint; // Drag your respawn location here in Inspector
-    public float fallThresholdY = 1000f; // If priest falls below this, we respawn
-
+    public Transform respawnPoint;
+    public float fallThresholdY = 1000f;
 
     [Header("Jump Scare")]
-    public bool enableJumpScare = false;
+    public bool enableJumpScare = true;
     public AudioClip jumpScareClip;
     public bool isJumpScaring = false;
-    public float jumpScareSpeed = 10f;
-    public float jumpScareDistance = 0.25f;
-    public Vector3 jumpScareOffset = new Vector3(0, 0f, 0); // adjust face height
-    private Vector3 jumpScareTarget;
 
-    [Header("Respawn After JumpScare")]
+    [Tooltip("How fast the priest lunges.")]
+    public float jumpScareSpeed = 25f;
+
+    [Tooltip("Camera-facing offset (moves target slightly up/down/side).")]
+    public Vector3 jumpScareOffset = new Vector3(0f, -0.7f, 0f);
 
     [Tooltip("How precisely the player must look at the priest to trigger a jumpscare (degrees).")]
-    public float jumpScareViewAngle = 10f;   // smaller = more accurate center view
-    public PriestManager spawner; // drag your spawner here in Inspector
+    public float jumpScareViewAngle = 20f;
+
+    [Header("Jump Scare Movement (Eggpit-style)")]
+    [Tooltip("How close the priest must get to the target before finishing jumpscare. Smaller = more screen-filling.")]
+    public float jumpScareStopDistance = 0.10f;
+
+    [Tooltip("How strongly the priest turns to face the camera during the lunge.")]
+    public float jumpScareTurnSpeed = 18f;
+
+    [Tooltip("How far in front of the camera the priest aims. Very small values = right in your face.")]
+    public float jumpScareFaceOffset = 0.05f;
+
+    [Tooltip("If true, the target is always aligned to the camera forward (recommended).")]
+    public bool jumpScareUseCameraForward = true;
+
+    [Tooltip("Optional: temporarily set all colliders to trigger during jumpscare to avoid snagging on geometry.")]
+    public bool makeCollidersTriggerDuringJumpScare = true;
+
+    [Tooltip("How long the priest stays stuck in your face before finishing the jumpscare.")]
+    public float jumpScareSpookTime = 0.75f;
+
+    private bool _jumpScareReachedFace = false;
+    private float _jumpScareSpookTimer = 0f;
+
+
+    private Vector3 jumpScareTarget;
+
+    [Header("Spawner / Respawn")]
+    public PriestManager spawner;
+    public PlayerRespawnHandler playerRespawn;
 
     [Header("Audio")]
-    public AudioSource breathSource;          // breathing loop source
-    public AudioSource whisperSource;         // whispers source
+    public AudioSource breathSource;
+    public AudioSource whisperSource;
 
-    public AudioClip hauntBreathingLoop;      // breathing loop sound
-    public AudioClip whisperLine1;            // "You shouldn't have come here..."
-    public AudioClip whisperLine2;            // "We have been waiting..."
+    public AudioClip hauntBreathingLoop;
+    public AudioClip whisperLine1;
+    public AudioClip whisperLine2;
 
-    public float whisperMinDelay = 4f;
-    public float whisperMaxDelay = 10f;
-    public float specialWhisperCooldown = 6f;
+    public float whisperMinDelay = 10f;
+    public float whisperMaxDelay = 20f;
+    public float specialWhisperCooldown = 15f;
 
     float whisperTimer;
     float lastSpecialWhisperTime = -999f;
 
-
-
     [Header("Distances")]
-    public float orbitRadius = 8f;
-    public float toHauntDistance = 20f;   // closer than this -> Haunt
-    public float toFleeDistance = 3f;     // TOO close -> Flee
+    public float orbitRadius = 20f;
+    public float toHauntDistance = 18f;
+    public float toFleeDistance = 9f;
 
     [Header("Speeds")]
     public float orbitSpeed = 25f;
-    public float hauntSpeed = 3f;
-    public float fleeSpeed = 10f;
+    public float hauntSpeed = 4f;
+    public float fleeSpeed = 30f;
 
     [Header("Haunt Behaviour")]
     [Range(-1f, 1f)]
-    [Tooltip("-1 = player looking away, 0 = 90 degr. left/right, 1 = player looking at priest")]
-    public float lookDotThreshold = 0.6f; // 1 = straight at priest
-    public float hauntStopDistance = 2f;  // how close Haunt is allowed to get
-    public float overhang = 5f;
+    public float lookDotThreshold = 0.4f;
+    public float hauntStopDistance = 10f;
+    public float overhang = 4f;
 
     [Header("Haunt Delay")]
-    public float hauntDelay = 3f;  // time from orbit to haunt
-    float hauntDelayTimer = 0f;    // delay from orbit to haunt
+    public float hauntDelay = 1f;
+    float hauntDelayTimer = 0f;
 
     [Header("Flee Behaviour")]
-    public bool enableFleeBehavior = true;   // master toggle
-    public bool requirePlayerMoving = true;  // only flee if player moves
+    public bool enableFleeBehavior = false;
+    public bool requirePlayerMoving = false;
     public float playerMoveThreshold = 0.15f;
-    public float fleeDistance = 60f;         // how far it runs away
+    public float fleeDistance = 150f;
 
     [Header("Return / Come-back Settings")]
     public bool useFleeTimer = true;
-    public float fleeTime = 5f;              // how long it stays in Flee before coming back
+    public float fleeTime = 10f;
 
     [Header("Floating / Ground")]
-    public float hoverHeight = 2f;
+    public float hoverHeight = 1.5f;
     public float floatAmplitude = 0.4f;
     public float floatFrequency = 1.5f;
     public float raycastHeight = 10f;
     public float raycastDistance = 30f;
     public LayerMask groundLayers = ~0;
-    public PlayerRespawnHandler playerRespawn;
-
-
-
 
     float orbitAngle;
     float floatPhase;
     Vector3 fleeTarget;
     float fleeTimer;
 
-    // --- NEW: track player movement based on position, not Rigidbody ---
     Vector3 lastPlayerPos;
     bool hasLastPlayerPos = false;
     float playerSpeed;
+
+    // collider trigger swap (optional)
+    Collider[] _cols;
+    bool[] _colsWasTrigger;
+    bool _jumpTriggerApplied;
 
     float FlatDistanceToPlayer()
     {
         Vector3 a = player.position;
         Vector3 b = transform.position;
-        a.y = b.y = 0f; // ignore height
+        a.y = b.y = 0f;
         return Vector3.Distance(a, b);
     }
 
@@ -114,9 +138,14 @@ public class HybridPriestAI : MonoBehaviour
         floatPhase = Random.Range(0f, 10f);
         whisperTimer = Random.Range(whisperMinDelay, whisperMaxDelay);
 
-        ///added lines?????????????????????????????????????????????????????????????????????????
         if (playerRespawn == null)
             playerRespawn = Object.FindFirstObjectByType<PlayerRespawnHandler>();
+
+        // cache colliders for optional trigger swap
+        _cols = GetComponentsInChildren<Collider>(true);
+        _colsWasTrigger = new bool[_cols.Length];
+        for (int i = 0; i < _cols.Length; i++)
+            _colsWasTrigger[i] = _cols[i].isTrigger;
     }
 
     void Update()
@@ -125,49 +154,15 @@ public class HybridPriestAI : MonoBehaviour
 
         UpdatePlayerSpeed();
 
-
         if (enableJumpScare && !isJumpScaring)
             TryJumpScareTrigger();
 
-        // Jump scare movement
+        // Eggpit-style jumpscare movement
         if (currentState == State.JumpScare)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                jumpScareTarget,
-                jumpScareSpeed * Time.deltaTime
-            );
-
-            transform.LookAt(playerCamera.position);
-
-            if (Vector3.Distance(transform.position, jumpScareTarget) < 0.15f)
-            {
-                // -------- RESET INTERNAL STATE --------
-                isJumpScaring = false;
-                hauntDelayTimer = 0f;
-                fleeTimer = fleeTime;
-                floatPhase = Random.Range(0f, 10f);   // randomizes floating again
-
-                // Reset & choose flee target (so he doesn’t hover in place)
-                Vector3 awayDir = (transform.position - player.position).normalized;
-                if (awayDir.sqrMagnitude < 0.01f)
-                    awayDir = -player.forward;
-                Vector3 randomSide = new Vector3(Random.Range(-0.5f, 0.5f), 0, Random.Range(-0.5f, 0.5f));
-                awayDir = (awayDir + randomSide).normalized;
-                fleeTarget = transform.position + awayDir * fleeDistance;
-
-                // -------- DESPAWN + PLAYER RESPAWN --------
-                if (spawner) spawner.DespawnPriest();
-                if (playerRespawn) playerRespawn.RespawnPlayer();
-                else Debug.LogWarning("PlayerRespawnHandler not assigned!");
-
-                currentState = State.Flee; // Continue your existing intended logic
-                return;
-            }
-
+            DoJumpScareMoveEggpitStyle();
             return;
         }
-
 
         // ---- Freeze logic (ONLY in Orbit & Haunt) ----
         Vector3 toPriest = (transform.position - playerCamera.position).normalized;
@@ -188,6 +183,7 @@ public class HybridPriestAI : MonoBehaviour
         {
             case State.Orbit:
                 hauntDelayTimer += Time.deltaTime;
+
                 if (enableFleeBehavior && distToPlayer < toFleeDistance && ShouldFleeFromPlayer())
                     EnterFleeState();
 
@@ -234,13 +230,154 @@ public class HybridPriestAI : MonoBehaviour
             case State.Flee: DoFlee(); break;
         }
 
-
         ApplyFloating();
+    }
+
+    // ================== JUMPSCARE ==================
+
+    void DoJumpScareMoveEggpitStyle()
+    {
+        if (!playerCamera) return;
+
+        if (makeCollidersTriggerDuringJumpScare && !_jumpTriggerApplied)
+            SetAllCollidersTrigger(true);
+
+        Vector3 camPos = playerCamera.position;
+
+        // Stick target to camera every frame (this is the "stuff the screen" behaviour)
+        Vector3 forward = playerCamera.forward;
+        if (!jumpScareUseCameraForward)
+            forward = (camPos - transform.position).normalized;
+
+        jumpScareTarget = camPos + forward * jumpScareFaceOffset + jumpScareOffset;
+
+        // Turn aggressively to face camera
+        Vector3 aimDir = (camPos - transform.position);
+        if (aimDir.sqrMagnitude > 0.0001f)
+        {
+            Quaternion look = Quaternion.LookRotation(aimDir.normalized, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look, Time.deltaTime * jumpScareTurnSpeed);
+        }
+
+        // Move in
+        transform.position = Vector3.MoveTowards(transform.position, jumpScareTarget, jumpScareSpeed * Time.deltaTime);
+
+        // Finish
+        float d = Vector3.Distance(transform.position, jumpScareTarget);
+
+        if (!_jumpScareReachedFace)
+        {
+            if (d <= jumpScareStopDistance)
+            {
+                _jumpScareReachedFace = true;
+                _jumpScareSpookTimer = jumpScareSpookTime;
+            }
+        }
+        else
+        {
+            // STUCK IN YOUR FACE: keep him glued to the camera target
+            transform.position = jumpScareTarget;
+
+            _jumpScareSpookTimer -= Time.deltaTime;
+            if (_jumpScareSpookTimer <= 0f)
+            {
+                FinishJumpScare();
+            }
+        }
 
     }
 
+    void TryJumpScareTrigger()
+    {
+        if (!enableJumpScare || isJumpScaring) return;
+        if (!playerCamera) return;
 
-    // ================== LOGIC ==================
+        float dist = FlatDistanceToPlayer();
+
+        // Too far? No jumpscare!
+        if (dist > toHauntDistance + 1f) return;
+
+        // Too close? Don't glitch into the player's face from inside them
+        if (dist < 2f) return;
+
+        Vector3 toPriest = (transform.position - playerCamera.position).normalized;
+        float dot = Vector3.Dot(playerCamera.forward.normalized, toPriest);
+        float cosThreshold = Mathf.Cos(jumpScareViewAngle * Mathf.Deg2Rad);
+
+        if (dot < cosThreshold) return;
+
+        StartJumpScare();
+    }
+
+    void StartJumpScare()
+    {
+        isJumpScaring = true;
+        currentState = State.JumpScare;
+
+        // reset linger / stuck-in-face state
+        _jumpScareReachedFace = false;
+        _jumpScareSpookTimer = jumpScareSpookTime;
+
+        if (breathSource) breathSource.Stop();
+        if (whisperSource && jumpScareClip)
+            whisperSource.PlayOneShot(jumpScareClip);
+    }
+
+
+    void FinishJumpScare()
+    {
+        // -------- RESET INTERNAL STATE --------
+        isJumpScaring = false;
+        hauntDelayTimer = 0f;
+        fleeTimer = fleeTime;
+        floatPhase = Random.Range(0f, 10f);
+
+        // Reset & choose flee target (so he doesn’t hover in place)
+        Vector3 awayDir = (transform.position - player.position).normalized;
+        if (awayDir.sqrMagnitude < 0.01f)
+            awayDir = -player.forward;
+
+        Vector3 randomSide = new Vector3(Random.Range(-0.5f, 0.5f), 0f, Random.Range(-0.5f, 0.5f));
+        awayDir = (awayDir + randomSide).normalized;
+        fleeTarget = transform.position + awayDir * fleeDistance;
+
+        if (makeCollidersTriggerDuringJumpScare)
+            SetAllCollidersTrigger(false);
+
+        // -------- DESPAWN + PLAYER RESPAWN --------
+        if (spawner) spawner.DespawnPriest();
+        if (playerRespawn) playerRespawn.RespawnPlayer();
+        else Debug.LogWarning("PlayerRespawnHandler not assigned!");
+
+        currentState = State.Flee;
+    }
+
+    void SetAllCollidersTrigger(bool trigger)
+    {
+        if (_cols == null) return;
+
+        if (trigger)
+        {
+            for (int i = 0; i < _cols.Length; i++)
+            {
+                if (!_cols[i]) continue;
+                _colsWasTrigger[i] = _cols[i].isTrigger;
+                _cols[i].isTrigger = true;
+            }
+            _jumpTriggerApplied = true;
+        }
+        else
+        {
+            for (int i = 0; i < _cols.Length; i++)
+            {
+                if (!_cols[i]) continue;
+                _cols[i].isTrigger = _colsWasTrigger[i];
+            }
+            _jumpTriggerApplied = false;
+        }
+    }
+
+    // ================== GENERAL LOGIC ==================
 
     void UpdatePlayerSpeed()
     {
@@ -268,12 +405,10 @@ public class HybridPriestAI : MonoBehaviour
         currentState = State.Flee;
         fleeTimer = fleeTime;
 
-        // run away from the player, opposite direction
         Vector3 awayDir = (transform.position - player.position).normalized;
         if (awayDir.sqrMagnitude < 0.01f)
-            awayDir = -player.forward; // fallback
+            awayDir = -player.forward;
 
-        // little random spread so it doesn't always go in exact same line
         Vector3 randomSide = new Vector3(Random.Range(-0.5f, 0.5f), 0f, Random.Range(-0.5f, 0.5f));
         awayDir = (awayDir + randomSide).normalized;
 
@@ -295,14 +430,12 @@ public class HybridPriestAI : MonoBehaviour
 
     void DoHaunt()
     {
-        // Is player looking at us?
         Vector3 toPriest = (transform.position - playerCamera.position).normalized;
         Vector3 camForward = playerCamera.forward.normalized;
         bool playerLooking = Vector3.Dot(camForward, toPriest) > lookDotThreshold;
 
         float dist = FlatDistanceToPlayer();
 
-        // if player is moving, don't creep closer (just stare)
         if (requirePlayerMoving && playerSpeed > playerMoveThreshold)
         {
             transform.LookAt(player.position + Vector3.up * 1.5f);
@@ -340,7 +473,7 @@ public class HybridPriestAI : MonoBehaviour
         if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, raycastDistance, groundLayers))
         {
             Debug.LogWarning("Priest lost ground. Respawning...");
-            RespawnToSafePoint(startInFlee: true); // 👈 or false, depending on what you want
+            RespawnToSafePoint(startInFlee: true);
             return;
         }
 
@@ -350,8 +483,6 @@ public class HybridPriestAI : MonoBehaviour
         pos.y = groundY + hoverHeight + bob;
         transform.position = pos;
     }
-
-
 
     void StartHauntAudio()
     {
@@ -369,6 +500,7 @@ public class HybridPriestAI : MonoBehaviour
         if (breathSource.clip == hauntBreathingLoop)
             breathSource.Stop();
     }
+
     bool PlayerLookingAtPriest()
     {
         Vector3 toPriest = (transform.position - playerCamera.position).normalized;
@@ -379,7 +511,6 @@ public class HybridPriestAI : MonoBehaviour
     {
         if (!whisperSource) return;
 
-        // pick between line1 and line2
         AudioClip clip = null;
         if (whisperLine1 != null && whisperLine2 != null)
             clip = (Random.value > 0.5f) ? whisperLine1 : whisperLine2;
@@ -398,7 +529,6 @@ public class HybridPriestAI : MonoBehaviour
     {
         if (!whisperSource || whisperLine1 == null) return;
 
-        // avoid ridiculous overlap spam
         if (!whisperSource.isPlaying)
         {
             whisperSource.pitch = 1f;
@@ -410,10 +540,8 @@ public class HybridPriestAI : MonoBehaviour
     {
         if (!whisperSource) return;
 
-        // only whisper when player is NOT staring at him
         if (!PlayerLookingAtPriest())
         {
-            // --- random whispers every X–Y seconds ---
             whisperTimer -= Time.deltaTime;
             if (whisperTimer <= 0f)
             {
@@ -421,7 +549,6 @@ public class HybridPriestAI : MonoBehaviour
                 whisperTimer = Random.Range(whisperMinDelay, whisperMaxDelay);
             }
 
-            // --- special line when close ("you shouldn't have come here") ---
             float dist = FlatDistanceToPlayer();
             if (dist < hauntStopDistance + 1.5f &&
                 Time.time - lastSpecialWhisperTime > specialWhisperCooldown)
@@ -431,61 +558,12 @@ public class HybridPriestAI : MonoBehaviour
             }
         }
     }
-    void TryJumpScareTrigger()
-    {
-        if (!enableJumpScare || isJumpScaring) return;
-        if (!playerCamera) return;
-
-        float dist = FlatDistanceToPlayer();
-
-        // Too far? No jumpscare!
-        if (dist > toHauntDistance + 1f) return;
-
-        // Too close? Don't glitch into the player's face
-        if (dist < 2f) return;
-
-        // Player must be looking accurately at priest
-        Vector3 toPriest = (transform.position - playerCamera.position).normalized;
-        float dot = Vector3.Dot(playerCamera.forward.normalized, toPriest);
-        float cosThreshold = Mathf.Cos(jumpScareViewAngle * Mathf.Deg2Rad);
-
-        if (dot < cosThreshold) return;
-
-        StartJumpScare();
-
-    }
-
-    void StartJumpScare()
-    {
-        isJumpScaring = true;
-        currentState = State.JumpScare;
-
-
-        Vector3 camPos = playerCamera.position;
-        Vector3 priestPos = transform.position;
-
-        // New: direct aim *at* camera
-        Vector3 dir = (playerCamera.position - priestPos).normalized;
-
-        // target: a little in front of the camera
-        jumpScareTarget = playerCamera.position
-                        + playerCamera.forward * jumpScareDistance
-                        + jumpScareOffset;
-
-
-        // Face camera while flying
-        transform.LookAt(new Vector3(camPos.x, priestPos.y, camPos.z));
-
-        if (breathSource) breathSource.Stop();
-        if (whisperSource && jumpScareClip)
-            whisperSource.PlayOneShot(jumpScareClip);
-    }
 
     public void RespawnToSafePoint(bool startInFlee = false)
     {
         if (respawnPoint == null)
         {
-            Debug.LogWarning("No respawn point set for HybridPriestAI.");
+            Debug.LogWarning("No respawn point set for HybridPriestAI_V2.");
             return;
         }
 
@@ -495,12 +573,14 @@ public class HybridPriestAI : MonoBehaviour
         isJumpScaring = false;
         hauntDelayTimer = 0f;
 
+        if (makeCollidersTriggerDuringJumpScare)
+            SetAllCollidersTrigger(false);
+
         if (startInFlee)
         {
             currentState = State.Flee;
             fleeTimer = fleeTime;
 
-            // Pick flee direction
             Vector3 awayDir = (transform.position - player.position).normalized;
             Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 0f, Random.Range(-0.5f, 0.5f));
             awayDir = (awayDir + randomOffset).normalized;
@@ -515,7 +595,4 @@ public class HybridPriestAI : MonoBehaviour
             Debug.Log("Priest respawned into Orbit state.");
         }
     }
-
-
-
 }

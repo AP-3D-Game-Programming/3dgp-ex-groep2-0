@@ -704,7 +704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8710b21d0ecb10489a9b6f0c8a1c8b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  additiveSceneName: 3. Level1JH
+  additiveSceneName: Level1JH
   spawnPoint: {fileID: 1196222332}
 --- !u!28 &419374059
 Texture2D:
@@ -15411,6 +15411,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 937759369672110685, guid: 16635f1a2351dc34aa8b84074f3f2174, type: 3}
+      propertyPath: sceneName
+      value: Level1JH
+      objectReference: {fileID: 0}
     - target: {fileID: 937759369672110685, guid: 16635f1a2351dc34aa8b84074f3f2174, type: 3}
       propertyPath: carEntryScript
       value: 

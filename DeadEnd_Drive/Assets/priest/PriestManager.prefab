@@ -47,4 +47,4 @@ MonoBehaviour:
   priest: {fileID: 0}
   spawnPoint: {fileID: 0}
   enableAutoRespawn: 1
-  respawnDelay: 15
+  respawnDelay: 10
