@@ -13,14 +13,14 @@ public class MonsterStandard : MonoBehaviour
     public GameObject scareCamera;
 
     [Header("Game Over UI")]
-    public GameObject gameOverScreen;
-    public TMP_Text youDiedText;
-    public Button respawnButton;
+    public GameObject gameOverScreen; // Dit moet het 'GameOverScreen' object zijn in je Canvas
+    public TMP_Text youDiedText;      // Dit is de 'Text (TMP)' ONDER het GameOverScreen
+    public Button respawnButton;      // Dit is de 'Respawn' knop ONDER het GameOverScreen
 
     [Header("Timing Instellingen")]
-    public float timeToStareAtMonster = 2.0f; // Hoe lang kijk je naar het monster?
-    public float textFadeInDuration = 4.0f;   // Hoe langzaam verschijnt de tekst? (Langer = dramatischer)
-    public float waitBeforeButton = 2.0f;     // Wachttijd nadat tekst er is
+    public float timeToStareAtMonster = 2.0f; // Tijd voor de jumpscare
+    public float textFadeInDuration = 4.0f;   // Hoe langzaam de tekst verschijnt
+    public float waitBeforeButton = 2.0f;     // Extra wachttijd voordat je kunt klikken
 
     [Header("Instellingen Jagen")]
     public float lookRadius = 15f;
@@ -59,17 +59,25 @@ public class MonsterStandard : MonoBehaviour
 
         startPosition = transform.position;
 
+        // Zorg dat alles goed staat bij het begin
         if (scareCamera != null) scareCamera.SetActive(false);
+        
+        // Verberg het Game Over scherm bij de start
         if (gameOverScreen != null) gameOverScreen.SetActive(false);
+        
+        // Verberg de knop bij de start
         if (respawnButton != null) 
         {
             respawnButton.gameObject.SetActive(false);
+            // Verwijder oude listeners om dubbele clicks te voorkomen en voeg nieuwe toe
+            respawnButton.onClick.RemoveAllListeners();
             respawnButton.onClick.AddListener(RestartScene);
         }
     }
 
     void Update()
     {
+        // Als speler dood is of er is geen speler, doe niets
         if (player == null || hasAttacked) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -96,40 +104,51 @@ public class MonsterStandard : MonoBehaviour
 
     void AttackPlayer()
     {
+        // VEILIGHEID: Zorg dat de tijd loopt, anders werken Coroutines niet
+        Time.timeScale = 1f;
+
         hasAttacked = true;
         isChasing = false;
 
         // 1. Stop Monster
-        agent.isStopped = true;
-        agent.ResetPath();
+        if (agent.isOnNavMesh) 
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
 
-        // 2. Camera Wissel (Zorg dat ScareCamera een AudioListener heeft!)
+        // 2. Camera Wissel
         if (mainCamera != null) mainCamera.SetActive(false);
         if (scareCamera != null) scareCamera.SetActive(true);
 
-        // 3. Geluid afspelen
-        // We gebruiken PlayOneShot zodat het geluid helemaal afspeelt
+        // 3. Geluid
         if (attackSound != null) audioSource.PlayOneShot(attackSound);
         
+        // Start de animatie reeks
         StartCoroutine(GameOverSequence());
     }
 
     IEnumerator GameOverSequence()
     {
-        // Stap 1: We staren naar het monster terwijl het geluid speelt
+        // Stap 1: Staren naar monster
         yield return new WaitForSeconds(timeToStareAtMonster);
 
-        // Stap 2: Scherm wordt zwart (of rood, wat je paneel ook is)
-        if (gameOverScreen != null) gameOverScreen.SetActive(true);
-
-        // Stap 3: Tekst begint langzaam te verschijnen
-        if (youDiedText != null)
+        // Stap 2: Scherm AANZETTEN
+        if (gameOverScreen != null) 
         {
-            youDiedText.canvasRenderer.SetAlpha(0f); // Begin onzichtbaar
-            youDiedText.CrossFadeAlpha(1f, textFadeInDuration, false); // Fade langzaam in
+            gameOverScreen.SetActive(true);
         }
 
-        // Wacht terwijl de tekst infade
+        // Stap 3: Tekst Fade Effect
+        if (youDiedText != null)
+        {
+            // Zet alpha direct op 0 (onzichtbaar)
+            youDiedText.canvasRenderer.SetAlpha(0f); 
+            // Fade naar 1 (zichtbaar). De 'true' negeert timescale.
+            youDiedText.CrossFadeAlpha(1f, textFadeInDuration, true); 
+        }
+
+        // Wacht terwijl de tekst infade + de extra wachttijd
         yield return new WaitForSeconds(textFadeInDuration + waitBeforeButton);
 
         // Stap 4: Muis en Knop
