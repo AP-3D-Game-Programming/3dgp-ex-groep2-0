@@ -1423,7 +1423,7 @@ MonoBehaviour:
   urpAsset: {fileID: 11400000, guid: 4b83569d67af61e458304325a23e5dfd, type: 2}
   graphics: {fileID: 1668344147}
   titleScreen: {fileID: 1356003281}
-  sceneToLoad: Main
+  sceneToLoad: MainLvl1
 --- !u!114 &573069722
 MonoBehaviour:
   m_ObjectHideFlags: 0
