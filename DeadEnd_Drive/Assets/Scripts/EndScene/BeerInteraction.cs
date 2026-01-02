@@ -3,10 +3,19 @@ using UnityEngine;
 
 public class BeerInteraction : MonoBehaviour
 {
- [Header("Instellingen")]
+    [Header("Instellingen")]
     public Animator anim;
-    public GameObject tekstObject;
-    public float animatieDuur = 4.0f; // VUL HIER IN: Hoe lang duurt je animatie (in seconden)?
+    public GameObject drukOpETekst;    
+    public GameObject subtitelTekst;   
+    public float animatieDuur = 4.0f; 
+
+    [Header("Nieuwe Tekst & Deur")]
+    public GameObject werkTekst;       
+    public float wachttijdNaBier = 5.0f; 
+    public float tekstDuur = 4.0f;     
+    
+    // NIEUW: De koppeling naar de deur
+    public DeurSequentie deDeur; 
 
     [Header("Speler Bevriezen")]
     public MonoBehaviour loopScript;
@@ -17,40 +26,54 @@ public class BeerInteraction : MonoBehaviour
 
     void Start()
     {
-        if (tekstObject != null) tekstObject.SetActive(false);
+        if (drukOpETekst != null) drukOpETekst.SetActive(false);
+        if (subtitelTekst != null) subtitelTekst.SetActive(false);
+        if (werkTekst != null) werkTekst.SetActive(false);
     }
 
     void Update()
     {
         if (staatInDeBuurt && !actieGestart && Input.GetKeyDown(KeyCode.E))
         {
-            // Start de routine die wacht
             StartCoroutine(SpeelSceneAf());
         }
     }
 
-    // Dit is een speciale functie die de tijd kan pauzeren
     IEnumerator SpeelSceneAf()
     {
         actieGestart = true;
 
-        // 1. Verberg tekst & Bevries speler
-        if (tekstObject != null) tekstObject.SetActive(false);
+        if (drukOpETekst != null) drukOpETekst.SetActive(false);
         if (loopScript != null) loopScript.enabled = false;
         if (kijkScript != null) kijkScript.enabled = false;
 
-        // 2. Start de animatie
         if (anim != null) anim.SetTrigger("StartMijnAnimatie");
+        if (subtitelTekst != null) subtitelTekst.SetActive(true);
 
-        // 3. WACHT hier precies zolang als je hebt ingesteld
         yield return new WaitForSeconds(animatieDuur);
 
-        // 4. Alles is klaar: Geef controle terug aan de speler!
         if (loopScript != null) loopScript.enabled = true;
         if (kijkScript != null) kijkScript.enabled = true;
+        if (subtitelTekst != null) subtitelTekst.SetActive(false);
 
-        // Optioneel: Zet actieGestart op false als je het nog eens wilt kunnen doen
-        // actieGestart = false; 
+        // Wachten...
+        yield return new WaitForSeconds(wachttijdNaBier);
+
+        // Tekst tonen
+        if (werkTekst != null) werkTekst.SetActive(true);
+
+        // --- HIER GAAT DE DEUR VAN HET SLOT ---
+        if (deDeur != null)
+        {
+            deDeur.magOpenen = true; 
+            // Als de speler toevallig al bij de deur staat, toon dan nu de "Press E" tekst
+            // (Dit is een detail, maar maakt het netter)
+            deDeur.tekstObject.SetActive(true); 
+        }
+        // --------------------------------------
+
+        yield return new WaitForSeconds(tekstDuur);
+        if (werkTekst != null) werkTekst.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -58,7 +81,7 @@ public class BeerInteraction : MonoBehaviour
         if (other.CompareTag("Player") && !actieGestart)
         {
             staatInDeBuurt = true;
-            if (tekstObject != null) tekstObject.SetActive(true);
+            if (drukOpETekst != null) drukOpETekst.SetActive(true);
         }
     }
 
@@ -67,7 +90,7 @@ public class BeerInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             staatInDeBuurt = false;
-            if (tekstObject != null) tekstObject.SetActive(false);
+            if (drukOpETekst != null) drukOpETekst.SetActive(false);
         }
     }
 }

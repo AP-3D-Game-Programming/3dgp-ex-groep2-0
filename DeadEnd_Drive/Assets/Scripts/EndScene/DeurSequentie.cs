@@ -3,46 +3,57 @@ using UnityEngine;
 
 public class DeurSequentie : MonoBehaviour
 {
-    private Animator mijnAnimator;
+public Animator deurAnimator;
+    public GameObject tekstObject; // "Press E to open"
+
+    // NIEUW: Het slot. Staat standaard op FALSE (dicht).
+    public bool magOpenen = false; 
+
     private bool spelerIsInDeBuurt = false;
     private bool deurIsAlOpen = false;
 
     void Start()
     {
-        // We pakken automatisch de animator van dit object
-        mijnAnimator = GetComponent<Animator>();
+        if (tekstObject != null) tekstObject.SetActive(false);
     }
 
     void Update()
     {
-        // 1. Is de speler er? 2. Is de deur nog dicht? 3. Drukt hij op E?
-        if (spelerIsInDeBuurt == true && deurIsAlOpen == false && Input.GetKeyDown(KeyCode.E))
+        // We voegen '&& magOpenen' toe aan de check
+        if (spelerIsInDeBuurt && !deurIsAlOpen && magOpenen && Input.GetKeyDown(KeyCode.E))
         {
             OpenNuDeDeur();
+        }
+        // Optioneel: Als je op E drukt terwijl hij op slot zit (voor testen handig)
+        else if (spelerIsInDeBuurt && !deurIsAlOpen && !magOpenen && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("Deur zit nog op slot! Drink eerst je bier.");
         }
     }
 
     void OpenNuDeDeur()
     {
-        deurIsAlOpen = true; // Zodat we niet nog eens kunnen drukken
-        mijnAnimator.SetTrigger("Open"); // Dit moet exact matchen met je parameter in Stap 3
+        deurIsAlOpen = true;
+        deurAnimator.SetTrigger("Open");
+        if (tekstObject != null) tekstObject.SetActive(false);
     }
 
-    // Dit gebeurt als er 'iets' in de Trigger zone loopt
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // Check of het wel de speler is
+        if (other.CompareTag("Player") && !deurIsAlOpen)
         {
             spelerIsInDeBuurt = true;
+            // We tonen de tekst alleen als hij ook echt open MAG
+            if (tekstObject != null && magOpenen) tekstObject.SetActive(true);
         }
     }
 
-    // Dit gebeurt als dat 'iets' weer wegloopt
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             spelerIsInDeBuurt = false;
+            if (tekstObject != null) tekstObject.SetActive(false);
         }
     }
 }

@@ -24,20 +24,20 @@ public class DreamSequence : MonoBehaviour
         if (playerMovementScript != null) playerMovementScript.enabled = false;
 
         // 2. Start de animatie & Toon TEKST 1 (Tijdens animatie)
-        tekstVak.text = "Huh, waar ben ik?";
+        tekstVak.text = "Huh, where am I?";
         tekstVak.gameObject.SetActive(true);
 
         // Wacht zolang de animatie duurt
         yield return new WaitForSeconds(animatieDuur);
 
         // 3. Animatie is klaar -> Toon TEKST 2
-        tekstVak.text = "Ik ben in mijn bed. Het was dus allemaal een droom.";
+        tekstVak.text = "I am just in my bed. That means it was all just a dream.";
         
         // Wacht even zodat de speler kan lezen
         yield return new WaitForSeconds(leesTijd);
 
         // 4. Toon TEKST 3
-        tekstVak.text = "Ik ga kijken of er nog een biertje is op het aanrecht, want dat heb ik nu wel nodig.";
+        tekstVak.text = "I am going to look if there is a beer in the kitchen, I need it.";
 
         // Wacht iets langer omdat deze zin langer is
         yield return new WaitForSeconds(leesTijd + 2.0f); 
