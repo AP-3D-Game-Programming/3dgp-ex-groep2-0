@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class StartGame : MonoBehaviour
 {
-    public float diveSpeed = 100f;
+    public float moveSpeed = 5f;
     public string nextSceneName;
     public GameObject TopCamera;
     public Canvas menuCanvas;
@@ -12,17 +12,24 @@ public class StartGame : MonoBehaviour
 
     public void startCall()
     {
-        StartCoroutine(DiveAndLoad());
+        StartCoroutine(MoveAndLoad());
     }
 
-    private System.Collections.IEnumerator DiveAndLoad()
+    private System.Collections.IEnumerator MoveAndLoad()
     {
         if (menuCanvas != null)
             menuCanvas.enabled = false;
 
-        while (TopCamera.transform.position.y > 45f)
+        Vector3 startPos = TopCamera.transform.position;
+        Vector3 targetPos = startPos + TopCamera.transform.forward * 20f;
+
+        while (Vector3.Distance(TopCamera.transform.position, targetPos) > 0.01f)
         {
-            TopCamera.transform.position += Vector3.down * diveSpeed * Time.deltaTime;
+            TopCamera.transform.position = Vector3.MoveTowards(
+                TopCamera.transform.position,
+                targetPos,
+                moveSpeed * Time.deltaTime
+            );
             yield return null;
         }
 
