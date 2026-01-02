@@ -27,6 +27,8 @@ public class CarEntry : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI carEntry;
     public TextMeshProUGUI gasEmptyText;
+    public int text = 1;
+
 
     private bool isInVehicle = false;
     private bool hasRideFinished = false;
@@ -217,7 +219,10 @@ public class CarEntry : MonoBehaviour
     {
         if (gasEmptyText != null)
         {
+            if (text == 1)
             gasEmptyText.text = "Dammit... Gas is empty. Maybe there's something in that house.";
+            if (text == 2)
+                gasEmptyText.text = "Maybe I should go back in that house? I don't think I have any other choice.";
             gasEmptyText.gameObject.SetActive(true);
 
             yield return new WaitForSeconds(4f);

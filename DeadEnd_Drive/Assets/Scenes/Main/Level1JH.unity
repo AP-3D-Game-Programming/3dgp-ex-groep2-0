@@ -5937,6 +5937,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1653065935127296865, guid: 6076eb3492ef0ca43881fd7fc0d3285b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1604931246}
     - targetCorrespondingSourceObject: {fileID: 3608733333429908434, guid: 6076eb3492ef0ca43881fd7fc0d3285b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1298355644}
@@ -5962,7 +5965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blackOverlay: {fileID: 1895218189}
-  sceneName: Level2JH
+  sceneName: 4. RyanLevel
   fadeDuration: 0.2
 --- !u!64 &1298355644
 MeshCollider:
@@ -10509,6 +10512,24 @@ Texture2D:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1604931245 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1653065935127296865, guid: 6076eb3492ef0ca43881fd7fc0d3285b, type: 3}
+  m_PrefabInstance: {fileID: 1298355641}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1604931246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604931245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e0a8e5b56de9ca4b93ef0e3f1f707aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SceneName: 
 --- !u!28 &1619908692
 Texture2D:
   m_ObjectHideFlags: 0

@@ -4,33 +4,52 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using static UnityEngine.Rendering.BoolParameter;
 
-public class SpawnHouseScript : MonoBehaviour
+public class NewHouseScript : MonoBehaviour
 {
     public GameObject house;
-    public TextMeshProUGUI dialog;
+    public GameObject jerryCan;
     public GameObject newTrigger;
-
+    private bool triggered;
+    public TextMeshProUGUI dialog;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        house.gameObject.SetActive(false);
+        triggered = false;
+    }
 
-
+    private void Update()
+    {
+        if (!triggered)
+            newTrigger.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (!triggered && other.CompareTag("Player"))
         {
-            house.gameObject.SetActive(true);
-            newTrigger.gameObject.SetActive(true);
+            triggered = true;
+            DeleteHouseAndJerrycan();
+            AddNewTrigger();
             dialog.alpha = 1f;
-            dialog.text = "Wait... I'm back in the same house? Something feels off...";
+            dialog.gameObject.SetActive(true);
+            dialog.text = "Hey! Where did the jerrycan go? I really don't like this place...";
             dialog.gameObject.SetActive(true);
             StartCoroutine(FadeOut());
         }
+    }
+
+    private void DeleteHouseAndJerrycan()
+    {
+        jerryCan.gameObject.SetActive(false);
+        house.gameObject.SetActive(false);
+    }
+
+    private void AddNewTrigger()
+    {
+        newTrigger.gameObject.SetActive(true);
+
     }
 
     IEnumerator FadeOut()
