@@ -15935,6 +15935,42 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 83285260138342615, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 83285260138342615, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 83285260138342615, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1400
+      objectReference: {fileID: 0}
+    - target: {fileID: 83285260138342615, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 83285260138342615, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1034022748745602042, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1668614809295807752, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1400
+      objectReference: {fileID: 0}
+    - target: {fileID: 1668614809295807752, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1668614809295807752, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -100
+      objectReference: {fileID: 0}
     - target: {fileID: 2724517712330768021, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 299.5
@@ -15987,6 +16023,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 630497838}
+    - target: {fileID: 7772699073260430582, guid: de1e22a64e15b1f4792abb18c3b34dd9, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
