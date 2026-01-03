@@ -84,6 +84,6 @@ public class BigJerryCanScript : MonoBehaviour
         src.Play();
 
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("5. Level2Mist");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Level2MistLvl5");
     }
 }
