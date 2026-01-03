@@ -1401,7 +1401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 15
-  nextSceneName: Main
+  nextSceneName: MainLvl1
   TopCamera: {fileID: 1857679027}
   menuCanvas: {fileID: 1356003281}
   blackScreen: {fileID: 26458627}
