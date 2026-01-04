@@ -114,6 +114,7 @@ QualitySettings:
     excludedTargetPlatforms:
     - Android
     - iPhone
+    - WebGL
   - serializedVersion: 4
     name: High
     pixelLightCount: 2
@@ -168,6 +169,7 @@ QualitySettings:
     excludedTargetPlatforms:
     - Android
     - iPhone
+    - WebGL
   m_TextureMipmapLimitGroupNames: []
   m_PerPlatformDefaultQuality:
     Android: 0

@@ -1,6 +1,5 @@
 using System.Collections;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,7 +79,7 @@ public class BigJerryCanScript : MonoBehaviour
 
             yield return null; // Wacht tot het volgende frame
         }
-            blackscreen.gameObject.SetActive(true);
+        blackscreen.gameObject.SetActive(true);
         src.Play();
 
 
