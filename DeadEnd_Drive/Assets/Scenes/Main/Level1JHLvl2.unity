@@ -4258,6 +4258,12 @@ MonoBehaviour:
   player: {fileID: 954914479}
   respawnPoints:
   - {fileID: 1708384997}
+  - {fileID: 286057570}
+  - {fileID: 2095877974}
+  - {fileID: 870979023}
+  - {fileID: 1497673068}
+  - {fileID: 1497673068}
+  - {fileID: 870979023}
 --- !u!4 &898625111
 Transform:
   m_ObjectHideFlags: 0
