@@ -310,6 +310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30194b31412879a4897bbed7ae4a4f7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneName: endingLvl7
   treeObject: {fileID: 980690944}
   fallDuration: 1.5
   fallRotation: {x: 0, y: 0, z: 90}

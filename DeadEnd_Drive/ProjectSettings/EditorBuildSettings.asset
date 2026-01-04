@@ -6,19 +6,19 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/Main/MenuLvl0.unity
+    path: Assets/scenes/Main/MenuLvl0.unity
     guid: 4c9f1cdc88f52a84ea13fac6eb7a3120
   - enabled: 1
-    path: Assets/Scenes/Main/MainLvl1.unity
+    path: Assets/scenes/Main/MainLvl1.unity
     guid: 4c3c352f4ae10234287ea388b1a0c4a5
   - enabled: 1
-    path: Assets/Scenes/Main/Level1JHLvl2.unity
+    path: Assets/scenes/Main/Level1JHLvl2.unity
     guid: 41fd3b1716ab10744acc81aa9ff0c4fb
   - enabled: 0
-    path: Assets/Scenes/Main/DezeNietGebruikt.unity
+    path: Assets/scenes/Main/DezeNietGebruikt.unity
     guid: b7f8a649fc6acbe47955984fe46f809b
   - enabled: 0
     path: Assets/Scenes/RyanFolder/RyanLevel_1.unity
@@ -27,16 +27,16 @@ EditorBuildSettings:
     path: Assets/Scenes/RyanFolder/RyanLevel_2.unity
     guid: eaa336ba2d2432648a713c642ee5b580
   - enabled: 1
-    path: Assets/Scenes/Main/Level2MistLvl5.unity
+    path: Assets/scenes/Main/Level2MistLvl5.unity
     guid: d1605697046d4634fa5e7fc1a5a503cb
   - enabled: 1
-    path: Assets/Scenes/Main/RyanLevel4.unity
+    path: Assets/scenes/Main/RyanLevel4.unity
     guid: 4c029c7c6250a994b85266dc1512ef8a
   - enabled: 1
-    path: Assets/Scenes/Main/crashLvl6.unity
+    path: Assets/scenes/Main/crashLvl6.unity
     guid: 63f341c24a4c2ef4b8ca0d21966c60b5
   - enabled: 1
-    path: Assets/Scenes/Main/endingLvl7.unity
+    path: Assets/scenes/Main/endingLvl7.unity
     guid: 5930c66dab4aa814aa2cb4f0494c2bd5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

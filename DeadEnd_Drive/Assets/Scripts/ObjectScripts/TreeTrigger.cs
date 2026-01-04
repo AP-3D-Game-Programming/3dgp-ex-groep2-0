@@ -1,9 +1,12 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI; // Needed for UI
+using UnityEngine.SceneManagement;
 
 public class TreeTrigger : MonoBehaviour
 {
+    public string sceneName;
+
     [Header("Tree Settings")]
     public GameObject treeObject;
     public float fallDuration = 1.5f;
@@ -70,6 +73,6 @@ public class TreeTrigger : MonoBehaviour
         // Ensure it's fully black at the end
         if (blackScreenGroup != null) blackScreenGroup.alpha = 1f;
 
-        Debug.Log("Screen is Black. Load next level or stop game here.");
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 }
