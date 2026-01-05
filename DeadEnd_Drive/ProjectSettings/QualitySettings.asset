@@ -4,7 +4,7 @@
 QualitySettings:
   m_ObjectHideFlags: 0
   serializedVersion: 5
-  m_CurrentQuality: 2
+  m_CurrentQuality: 0
   m_QualitySettings:
   - serializedVersion: 4
     name: Low
@@ -33,7 +33,7 @@ QualitySettings:
     realtimeGICPUUsage: 100
     adaptiveVsyncExtraA: 0
     adaptiveVsyncExtraB: 0
-    lodBias: 1
+    lodBias: 0.8
     maximumLODLevel: 0
     enableLODCrossFade: 1
     streamingMipmapsActive: 0
@@ -44,16 +44,16 @@ QualitySettings:
     streamingMipmapsMaxFileIORequests: 1024
     particleRaycastBudget: 128
     asyncUploadTimeSlice: 2
-    asyncUploadBufferSize: 16
+    asyncUploadBufferSize: 24
     asyncUploadPersistentBuffer: 1
-    resolutionScalingFixedDPIFactor: 0.7
+    resolutionScalingFixedDPIFactor: 0.6
     customRenderPipeline: {fileID: 11400000, guid: 4b83569d67af61e458304325a23e5dfd, type: 2}
     terrainQualityOverrides: 17
     terrainPixelError: 3
     terrainDetailDensityScale: 1
     terrainBasemapDistance: 1000
     terrainDetailDistance: 80
-    terrainTreeDistance: 1000
+    terrainTreeDistance: 1253
     terrainBillboardStart: 50
     terrainFadeLength: 5
     terrainMaxTrees: 50
