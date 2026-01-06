@@ -45,3 +45,14 @@ Alle benodigde foto's en plattegronden zijn te vinden in de map: **"foto's"**.
 
 - `Basis.png`: Het hoofdplattegrond zonder veranderingen.
 - Overige bestanden: Bevatten elk één specifieke verandering, waarbij de aard van de verandering reeds **in de bestandsnaam** is aangegeven (bijv. `Keuken.png`, `Fiets.png`).
+
+## 📊 Uitkomst: Wat hebben we geleerd?
+
+De resultaten uit deze paper prototype waren cruciaal voor de huidige richting van de game:
+
+1. **Observatie-moeheid:** Hoewel bijna alle spelers de veranderingen vonden (behalve de laatste foto), bleek de actie van het 'zoeken' op zichzelf geen spanning op te leveren.
+2. **Gebrek aan Engagement:** De belangrijkste bevinding was dat spelers **weinig enthousiasme** toonden voor de pure "zoek de verschillen"-mechanic. Het voelde meer als een puzzel-taak dan als een angstaanjagende horrorervaring.
+
+### **Gevolg voor Ontwikkeling**
+
+In plaats van de speler te dwingen tot passieve observatie, hebben we de focus verschoven naar **surrealistische actie en atmosferische mindfucks**. De veranderingen in de wereld zijn nu groter, dynamischer en direct gekoppeld aan de angst van het personage, in plaats van een statische zoek-puzzel.

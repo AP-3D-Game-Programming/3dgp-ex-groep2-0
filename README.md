@@ -2,43 +2,42 @@
 
 ## Genre
 
-Psychologische Horror
+Psychologische Horror / Surrealistische Survival
 
 ## Korte Beschrijving
 
-"Dead End Drive" is een psychologische horrorgame waarin de speler vast komt te zitten in een eindeloze lus.
-
-Het spel begint terwijl het hoofdpersonage, rijdend in hun truck, zich in het pikkedonker op een verlaten, eenzame weg bevindt. De reis wordt abrupt onderbroken wanneer de brandstoftank leeg raakt. Noodgedwongen zoekt de speler de dichtstbijzijnde beschutting op: een afgelegen huis.
-
-Nadat de speler in het huis brandstof heeft gevonden en hun tank heeft gevuld, vervolgt deze de rit. Echter, na het nemen van de volgende afslag, verschijnt hetzelfde, identieke huis opnieuw, en de brandstoftank blijkt miraculeus weer leeg.
-
-Bij elke terugkeer in het huis ontdekt de speler dat er **iets is veranderd**: een object is verplaatst, een schilderij hangt scheef, of de volledige interieurindeling is veranderd. De speler moet deze afwijkingen identificeren om te overleven en de cyclus te doorbreken.
-
-De centrale plotvraag die de speler zich afvraagd is: "Hoe lang ben ik hier al?" Later komt het personage er achter dat alles een **nachtmerrieachtige droom** is, waarbij de speler de ultieme taak heeft om de cyclus te doorbreken en wakker te worden.
+"Dead End Drive" is een verwarrende horror survival game waarbij je in eenzelfde bepaalde cyclus komt. De bedoeling is dat je als speler de benzine van je auto terug vult door middel van een jerrycan te vinden en zo verder gaat in het spel tot je de cyclus breekt. De emoties die we willen opwekken bij de speler zijn: angst door jumpscares en vijanden toe te voegen en verwarring door dezelfde cyclus te herhalen
 
 ## 🌍 Setting
 
-De gehele ervaring speelt zich af in een **hedendaagse, maar extreem duistere en geïsoleerde omgeving**.
+De ervaring speelt zich af in een instabiele, droomachtige omgeving die constant van vorm verandert.
 
-- **Locatie:** Een desolate straat en één, schijnbaar identiek, afgelegen huis.
-- **Sfeer:** Een beklemmende en eenzame ambiance, benadrukt door constante duisternis en leegte.
+- **Het Huis:** Een herkenbaar maar onheilspellend interieur/exterieur waar vreemde gebeurtenissen plaatsvinden.
+- **De Mistwereld:** Een desolate, buitenwereld gehuld in dikke mist. Hier verliest de speler de oriëntatie en moet de auto telkens op een andere plek worden teruggevonden.
+- **De Lege Weg:** De verbindende factor die de illusie van ontsnapping biedt, maar de speler telkens terugvoert naar de kern van de droom.
 
-## 🕹️ Gameplay Voorbeeld (Kernlus)
+## 🕹️ Gameplay Verloop (De Cyclus)
 
-1.  **Rijden en Stoppen:** Het personage rijdt totdat de brandstof op is en stopt bij het huis.
-2.  **Verkenning en Observatie:** De speler betreedt het huis om brandstof te zoeken. **Cruciaal:** de speler inspecteert de omgeving nauwkeurig om alle details en de beginstaat van de kamer te memoriseren.
-3.  **Verschil Detecteren:** Bij de volgende cyclus in het huis, zoekt de speler naar de **specifieke afwijking** (bijv. een deurslot dat er voorheen niet was, een veranderde muurkleur).
-4.  **Consequenties:**
-    - **Vindt de speler de verandering:** De cyclus wordt voortgezet, en er wordt een nieuw stukje van de diepere verhaallijn onthuld.
-    - **Vindt de speler de verandering niet (of negeert deze):** Dit leidt tot een onmiddellijke 'dood' of een fatale tegenslag.
+De game is opgebouwd uit verschillende fasen waarin de speler telkens moet proberen weg te rijden terwijl de omgeving agressiever wordt:
+
+1.  **De Brandstofstop:** De speler strandt en moet het huis betreden. Hier vinden de eerste vreemde gebeurtenissen en "mindfucks" plaats.
+2.  **De Mist-Excursie:** Plotseling bevindt de speler zich in een mistwereld. Het doel is om de auto te lokaliseren en de sleutel te vinden, terwijl er subtiele, enge veranderingen in de omgeving optreden.
+3.  **De Escalatie (De Loop):** De speler keert terug naar de eerste wereld, maar alles is anders. De omgeving verandert actief en er vinden grote psychologische manipulaties plaats.
+4.  **De Finale Mist-Scene:** De mist keert terug, maar de auto staat op een compleet onlogische plek. De dreiging is nu op zijn hoogtepunt.
+5.  **Het Ontwaken:** Alleen door de auto te bereiken en de laatste obstakels te overwinnen, kan de speler de cyclus doorbreken en wakker worden uit de droom.
 
 ## ✨ Unieke Verkoopargumenten (USP)
 
-In vergelijking met vergelijkbare 'herhalingshorror' games (zoals _Exit 8_ of _The Cabin Factory_), onderscheidt **Dead End Drive** zich door:
+In vergelijking met standaard 'herhalingshorror' games, onderscheidt **Dead End Drive** zich door:
 
-- **Diepgaande, Uitgewerkte Storyline:** De focus ligt niet alleen op de lus, maar op de psychologische reis en de waarheid achter de droom. Dit zorgt voor een hogere mate van **immersie en betrokkenheid**.
-- **Emotionele Verdieping:** De verhaallijn is ontworpen om de speler emotioneel te raken, wat de **angst en het gevoel van isolatie** versterkt en de game spannender en enger maakt dan een pure observatie-uitdaging.
+- **Dynamische Wereldwisseling:** De vloeiende overgang tussen de claustrofobische sfeer van het huis en de verstikkende openheid van de mistwereld.
+- **Escalerende Mindfucks:** In plaats van alleen kleine details te zoeken, verandert de wereld actief om de speler heen (muren verdwijnen, kamers veranderen volledig).
+- **Emotionele Survival:** De constante drang om de auto te bereiken als baken van veiligheid, wat de angst versterkt wanneer de auto weer is verdwenen.
 
 ---
 
-**Vergelijkbare Titels:** _Exit 8_, _The Cabin Factory_
+**Vergelijkbare Titels:** _Silent Hill_ (atmosfeer/mist), _Layers of Fear_ (veranderende omgevingen), _P.T._ (loop-mechanics).
+
+---
+
+_Deze README is gestileerd en tekstueel geoptimaliseerd met de hulp van Gemini (Google AI)._
