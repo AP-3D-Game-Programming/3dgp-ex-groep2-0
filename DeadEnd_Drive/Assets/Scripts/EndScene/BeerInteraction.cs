@@ -14,7 +14,7 @@ public class BeerInteraction : MonoBehaviour
     public float wachttijdNaBier = 5.0f; 
     public float tekstDuur = 4.0f;     
     
-    // NIEUW: De koppeling naar de deur
+    // De koppeling naar de deur
     public DeurSequentie deDeur; 
 
     [Header("Speler Bevriezen")]
@@ -43,37 +43,44 @@ public class BeerInteraction : MonoBehaviour
     {
         actieGestart = true;
 
+        // Verberg de "Druk op E" prompt en zet speler vast
         if (drukOpETekst != null) drukOpETekst.SetActive(false);
         if (loopScript != null) loopScript.enabled = false;
         if (kijkScript != null) kijkScript.enabled = false;
 
+        // Start animatie en ondertiteling
         if (anim != null) anim.SetTrigger("StartMijnAnimatie");
         if (subtitelTekst != null) subtitelTekst.SetActive(true);
 
         yield return new WaitForSeconds(animatieDuur);
 
+        // Speler weer vrijgeven
         if (loopScript != null) loopScript.enabled = true;
         if (kijkScript != null) kijkScript.enabled = true;
         if (subtitelTekst != null) subtitelTekst.SetActive(false);
 
-        // Wachten...
+        // Wachten... (5 seconden)
         yield return new WaitForSeconds(wachttijdNaBier);
 
-        // Tekst tonen
+        // 1. Toon de "Ik moet werken" tekst
         if (werkTekst != null) werkTekst.SetActive(true);
 
-        // --- HIER GAAT DE DEUR VAN HET SLOT ---
+        // 2. Wacht terwijl deze tekst leesbaar is (4 seconden)
+        yield return new WaitForSeconds(tekstDuur);
+
+        // 3. Verberg de "Ik moet werken" tekst
+        if (werkTekst != null) werkTekst.SetActive(false);
+
+        // 4. NU PAS mag de deur open
         if (deDeur != null)
         {
             deDeur.magOpenen = true; 
-            // Als de speler toevallig al bij de deur staat, toon dan nu de "Press E" tekst
-            // (Dit is een detail, maar maakt het netter)
-            deDeur.tekstObject.SetActive(true); 
+            
+            // BELANGRIJK: Ik heb de regel 'deDeur.tekstObject.SetActive(true)' WEGGEHAALD.
+            // Reden: Je wilt niet dat de deurtekst verschijnt terwijl je nog bij het bier staat.
+            // Het script op de deur zelf moet regelen dat de tekst verschijnt 
+            // zodra de speler naar de deur toe loopt (via OnTriggerEnter op de deur).
         }
-        // --------------------------------------
-
-        yield return new WaitForSeconds(tekstDuur);
-        if (werkTekst != null) werkTekst.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -93,4 +100,4 @@ public class BeerInteraction : MonoBehaviour
             if (drukOpETekst != null) drukOpETekst.SetActive(false);
         }
     }
-}
+}   
