@@ -62,7 +62,7 @@ public class BigJerryCanScript : MonoBehaviour
         // Definieer de start- en eindrotatie
         Quaternion startRotation = Jerrycan.transform.rotation;
         // We voegen 90 graden toe aan de huidige Z-as
-        Quaternion endRotation = Jerrycan.transform.rotation * Quaternion.Euler(0, 0, 90f);
+        Quaternion endRotation = Jerrycan.transform.rotation * Quaternion.Euler(0, 0, 70f);
 
         float duration = 1.5f; // Hoeveel seconden de animatie duurt
         float elapsed = 0f;
@@ -81,6 +81,7 @@ public class BigJerryCanScript : MonoBehaviour
         }
         blackscreen.gameObject.SetActive(true);
         src.Play();
+        yield return new WaitForSeconds(2);
 
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("Level2MistLvl5");
