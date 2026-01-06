@@ -1,8 +1,6 @@
 using System.Collections;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
-using static UnityEngine.Rendering.BoolParameter;
 
 public class NewHouseScript : MonoBehaviour
 {

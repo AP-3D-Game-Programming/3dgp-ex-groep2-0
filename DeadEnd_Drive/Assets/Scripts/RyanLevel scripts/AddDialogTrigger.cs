@@ -1,9 +1,7 @@
 using System.Collections;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
-using static UnityEngine.Rendering.BoolParameter;
 
 public class AddDialogTrigger : MonoBehaviour
 {
@@ -18,7 +16,7 @@ public class AddDialogTrigger : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -29,7 +27,7 @@ public class AddDialogTrigger : MonoBehaviour
             triggered = true;
 
             StartCoroutine(FadeOut());
-            
+
         }
     }
 

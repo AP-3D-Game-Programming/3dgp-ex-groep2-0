@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class DeurSequentie : MonoBehaviour
 {
-public Animator deurAnimator;
+    public Animator deurAnimator;
     public GameObject tekstObject; // "Press E to open"
 
-    // NIEUW: Het slot. Staat standaard op FALSE (dicht).
+    // Het slot
     public bool magOpenen = false; 
 
     private bool spelerIsInDeBuurt = false;
@@ -19,22 +19,33 @@ public Animator deurAnimator;
 
     void Update()
     {
-        // We voegen '&& magOpenen' toe aan de check
+        // --- DEZE REGELS ZIJN NIEUW (De fix) ---
+        // Als de speler er staat, de deur dicht is, en hij MAG open, 
+        // maar de tekst staat uit? Zet hem dan alsnog aan.
+        if (spelerIsInDeBuurt && !deurIsAlOpen && magOpenen)
+        {
+            if (tekstObject != null && !tekstObject.activeSelf)
+            {
+                tekstObject.SetActive(true);
+            }
+        }
+        // ---------------------------------------
+
+        // De interactie check
         if (spelerIsInDeBuurt && !deurIsAlOpen && magOpenen && Input.GetKeyDown(KeyCode.E))
         {
             OpenNuDeDeur();
         }
-        // Optioneel: Als je op E drukt terwijl hij op slot zit (voor testen handig)
         else if (spelerIsInDeBuurt && !deurIsAlOpen && !magOpenen && Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("Deur zit nog op slot! Drink eerst je bier.");
+            Debug.Log("Deur zit nog op slot! Drink eerst je bier en wacht op de tekst.");
         }
     }
 
     void OpenNuDeDeur()
     {
         deurIsAlOpen = true;
-        deurAnimator.SetTrigger("Open");
+        if (deurAnimator != null) deurAnimator.SetTrigger("Open");
         if (tekstObject != null) tekstObject.SetActive(false);
     }
 
@@ -43,7 +54,7 @@ public Animator deurAnimator;
         if (other.CompareTag("Player") && !deurIsAlOpen)
         {
             spelerIsInDeBuurt = true;
-            // We tonen de tekst alleen als hij ook echt open MAG
+            // We proberen de tekst alvast te tonen, maar Update vangt het op als het nu nog niet mag
             if (tekstObject != null && magOpenen) tekstObject.SetActive(true);
         }
     }
